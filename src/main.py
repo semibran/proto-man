@@ -638,12 +638,14 @@ class Portrait(object):
         self.sprite.selected = selected
         if index == 0:
             self.sprite.index_face = 0
-        elif index == 3:
+        elif index == 2:
             self.sprite.index_face = 1
-        elif index == 4:
+        elif index == 3:
             self.sprite.index_face = 2
-        else:
+        elif index == 4:
             self.sprite.index_face = 3
+        else:
+            self.sprite.index_face = 4
         self.sprite.timer = 0
         self.sprite.limit = 10
         self.sprite.surface_face = Sprite(x + 8, y, 32, 40, 3, "portrait",
