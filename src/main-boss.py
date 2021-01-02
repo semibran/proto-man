@@ -983,9 +983,6 @@ class OrbExplosion(object):
             Orb((x, y), angle, 1)
             Orb((x, y), angle, 2)
             i += 1
-        sfx1.play(sfx_death1)
-        if not sfx2.get_sound() == sfx_life:
-            sfx2.play(sfx_death2)
 class Orb(object):
     def __init__(self, pos, angle, speed):
         x = pos[0]
@@ -1266,11 +1263,11 @@ class Player(object):
             self.dead = True
             if explosion:
                 OrbExplosion((self.center['x'], self.center['y']))
+            self.sprite.remove()
             square1.play(sfx_death1)
             square2.play(sfx_death2)
             triangle.stop()
             noise.stop()
-            self.sprite.remove()
     def hit(self, damage, direction=0):
         if not self.invincible and not self.dead:
             if direction == 0:
@@ -2540,6 +2537,10 @@ class Boss_Zeus(object):
                     OrbExplosion((self.center['x'], self.center['y']))
                     self.sprite.remove()
                     game.enemies.remove(self)
+                    square1.play(sfx_death1)
+                    square2.play(sfx_death2)
+                    triangle.stop()
+                    noise.stop()
                 self.sprite.visible = True
                 index = 0
                 if self.running:
@@ -2630,7 +2631,7 @@ class Boss_Zeus(object):
                     index = self.index_jump_back
                     self.velocity_x = self.run_speed/2 * -self.direction
                     self.jump_timer += 1
-                    if self.jump_timer >= 43:
+                    if self.jump_timer >= 42:
                         self.jump_timer = 0
                         self.turn()
                         self.dash()
@@ -2771,8 +2772,8 @@ class Game(object):
             "                 ",
             "                 ",
             "..               ",
-            ".,.              ",
-            ",....            ",
+            "...              ",
+            ".....            ",
             "..'....          ",
             "=================",
             "#######HHHH######",
@@ -3174,6 +3175,7 @@ paused = False
 confirmed = False
 fading = False
 introducing = False
+intro = False
 state = 'select'
 keys = pygame.key.get_pressed()
 last_keys = keys
@@ -3210,30 +3212,18 @@ while not done:
                 unpause()
         if event.type == square1_END:
             if not game == None:
-                if not square1.get_busy():
-                    if not game.player == None:
-                        print("play some music!")
-                        if game.blinking:
-                            square1.play(boss_battle_intro1)
-                            square2.play(boss_battle_intro2)
-                            triangle.play(boss_battle_intro3)
-                            noise.play(boss_battle_intro4)
-                        elif game.player == None or not game.player.dead:
-                            square1.play(boss_battle1, -1)
-                            square2.play(boss_battle2, -1)
-                            triangle.play(boss_battle3, -1)
-                            noise.play(boss_battle4, -1)
-                        # if game.blinking:
-                        #     square1.play(fireman_intro1)
-                        #     square2.play(fireman_intro2)
-                        #     triangle.play(fireman_intro3)
-                        #     noise.play(fireman_intro4)
-                        # else:
-                        #     if not (not game.player == None and game.player.dead):
-                        #         square1.play(fireman1, -1)
-                        #         square2.play(fireman2, -1)
-                        #         triangle.play(fireman3, -1)
-                        #         noise.play(fireman4, -1)
+                print("play some music!")
+                if not intro:
+                    intro = True
+                    square1.play(boss_battle_intro1)
+                    square2.play(boss_battle_intro2)
+                    triangle.play(boss_battle_intro3)
+                    noise.play(boss_battle_intro4)
+                elif game.player != None and not game.player.dead and len(game.enemies) != 0:
+                    square1.play(boss_battle1, -1)
+                    square2.play(boss_battle2, -1)
+                    triangle.play(boss_battle3, -1)
+                    noise.play(boss_battle4, -1)
         if event.type == sfx1_END:
             if confirmed and game == None:
                 square1.play(boss_intro1)
