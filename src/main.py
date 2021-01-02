@@ -49,10 +49,10 @@ icon.convert()
 pygame.display.set_icon(icon)
 
 folder_names = [
-  'SQUARE1',
-  'SQUARE2',
-  'TRIANGLE',
-  'NOISE',
+    'SQUARE1',
+    'SQUARE2',
+    'TRIANGLE',
+    'NOISE',
 ]
 
 select1 = load_music(0, 'select_new')
@@ -151,19 +151,19 @@ triangle.play(select3, -1)
 noise.play(select4, -1)
 
 sprites_map = {
-  "portrait": load_sprite("portrait"),
-  "chars": load_sprite("chars"),
-  "background": load_sprite("background"),
-  "intro": load_sprite("boss_intro"),
-  "zeus": load_sprite("zeus"),
-  "proto": load_sprite("proto"),
-  "tile": load_sprite("tiles"),
-  "life": load_sprite("life"),
-  "met": load_sprite("met"),
-  "effects": load_sprite("effects"),
-  "helikoppa": load_sprite("helikoppa"),
-  "explosion": load_sprite("explosion"),
-  "menu": load_sprite("menu"),
+    "portrait":load_sprite("portrait"),
+    "chars":load_sprite("chars"),
+    "background":load_sprite("background"),
+    "intro":load_sprite("boss_intro"),
+    "zeus":load_sprite("zeus"),
+    "proto":load_sprite("proto"),
+    "tile":load_sprite("tiles"),
+    "life":load_sprite("life"),
+    "met":load_sprite("met"),
+    "effects":load_sprite("effects"),
+    "helikoppa":load_sprite("helikoppa"),
+    "explosion":load_sprite("explosion"),
+    "menu":load_sprite("menu"),
 }
 
 charsCoords = {}
@@ -374,7 +374,7 @@ class BossIntro(object):
                 if self.name_timer >= self.name_limit:
                     self.name_timer = 0
                     self.naming = False
-                    self.name = ScreenText(128-len(self.boss_text)*4, 128, self.boss_text, True, 3)
+                    self.name = ScreenText(128-len(self.boss_text)*4, 128, self.boss_text, 1, 3)
             if self.star_fade_index > 0:
                 self.star_timer += 1
                 if self.star_timer >= self.star_limit:
@@ -500,11 +500,11 @@ class Sprite(object):
         except ValueError:
             print("Glitch averted.")
 class ScreenText(object):
-    def __init__(self, x, y, string, shadow, timer=0):
+    def __init__(self, x, y, string, style=0, timer=0):
         self.x = x
         self.y = y
         self.string = string
-        self.shadow = shadow
+        self.style = style
         self.timer = 0
         self.limit = timer
         self.chars = []
@@ -527,9 +527,7 @@ class ScreenText(object):
     def draw(self):
         i = 0
         for char in self.string:
-            indexY = charsCoords[char]['y']
-            if self.shadow:
-                indexY += 5
+            indexY = charsCoords[char]['y']+self.style*5
             c = Sprite(self.x+8*i, self.y, 8, 8, 10, "chars", charsCoords[char]['x']*8, indexY*8, 8, 8)
             c.on_level = True
             c.offset_x = c.x
@@ -559,9 +557,7 @@ class ScreenText(object):
             if self.timer >= self.limit:
                 self.timer = 0
                 char = self.string[self.char_index]
-                indexY = charsCoords[char]['y']
-                if self.shadow:
-                    indexY += 5
+                indexY = charsCoords[char]['y']+self.style*5
                 self.chars.append(Sprite(self.x+8*self.char_index, self.y, 8, 8, 1, "chars", charsCoords[char]['x']*8, indexY*8, 8, 8))
                 self.char_index += 1
 class Portrait(object):
@@ -1047,7 +1043,7 @@ class Player(object):
         self.health = self.health_max
         self.health_bar = HUDBar(24, 17, self.health, self.health_max, 0)
         self.lives = 2
-        self.life_text = ScreenText(0, 0, str(self.lives), True)
+        self.life_text = ScreenText(0, 0, str(self.lives), 1)
         self.velocity_x = 0
         self.velocity_y = 0
         self.gravity = 0.2
@@ -1185,7 +1181,7 @@ class Player(object):
         self.rect_last = self.rect
         self.idle_index = 0
         self.index_idle = 3
-        self.index_charge = 5
+        self.index_charge = 3#5
         self.index_run_phase = 6
         self.index_run = 7
         self.index_jump = 10
@@ -2715,6 +2711,29 @@ class Boss_Zeus(object):
                 self.facing = self.direction
                 self.sprite.flip_x = self.facing == 1
                 self.sprite.subX = index*self.sprite.subWidth
+class PauseMenu(object):
+    def __init__(self):
+        self.sprite = Sprite(0, 0, screen_size[0], screen_size[1], 0, 'menu')
+        self.text_start_x = 56
+        self.text_start_y = 42
+        self.text_interval_x = 112
+        self.text_interval_y = 20
+        self.texts = []
+        self.names = ['P.BUSTER', 'P.SHIELD', 'V.RUSH', 'D.SPIKE', 'V.DART', 'T.SLICER', '', '']
+        index = 0
+        for i in range(4):
+            for j in range(2):
+                x = self.text_start_x+self.text_interval_x*j
+                y = self.text_start_y+self.text_interval_y*i
+                text = ScreenText(x, y, self.names[index], 2)
+                self.texts.append(text)
+                for char in text.chars:
+                    char.on_level = False
+                index += 1
+    def remove(self):
+        for text in self.texts:
+            text.remove()
+        self.sprite.remove()
 class Game(object):
     def __init__(self):
         global game
@@ -2843,7 +2862,7 @@ class Game(object):
         self.death_timer = 0
         self.death_limit = 150
         self.playing = False
-        self.ready = ScreenText(108, 108, 'READY', True)
+        self.ready = ScreenText(108, 108, 'READY', 1)
     def parse(self, stage):
         global tiles
         for enemy in self.enemies:
@@ -2871,7 +2890,7 @@ class Game(object):
                 x += 1
             y += 1
     def pause(self):
-        self.menu = Sprite(0, 0, screen_size[0], screen_size[1], 8, 'menu')
+        self.menu = PauseMenu()
         self.paused = True
         fade(True, self.pause_fade_speed)
     def unpause(self):
@@ -2962,7 +2981,7 @@ class Game(object):
                         self.player.life_text.remove()
                         self.player.sprite.remove()
                         self.player = None
-                        self.ready = ScreenText(108, 108, 'READY', True)
+                        self.ready = ScreenText(108, 108, 'READY', 1)
                         fade(False, 2)
 
 selectBG = Sprite(0, 0, 256, 224,  0, "background", 0, 0, 256, 224)
@@ -2970,11 +2989,11 @@ selectBG = Sprite(0, 0, 256, 224,  0, "background", 0, 0, 256, 224)
 for i in range(7):
     Portrait(i, False)
 
-text_press_start = ScreenText(80, 8, "PRESS  START", True)
-text_zeus = ScreenText(72, 64, "ZEUS", True)
-text_heracles = ScreenText(136, 64, "HERACLES", True)
-text_nessos = ScreenText(24, 128, "NESSOS", True)
-text_cronus = ScreenText(184, 128, "CRONUS", True)
+text_press_start = ScreenText(80, 8, "PRESS  START", 1)
+text_zeus = ScreenText(72, 64, "ZEUS", 1)
+text_heracles = ScreenText(136, 64, "HERACLES", 1)
+text_nessos = ScreenText(24, 128, "NESSOS", 1)
+text_cronus = ScreenText(184, 128, "CRONUS", 1)
 text = [text_press_start, text_zeus, text_heracles, text_nessos, text_cronus]
 
 def pxarray_colors(pxarray):
