@@ -1,4 +1,4 @@
-import pygame, sys, random, math
+import pygame, sys, os, random, math
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 pygame.init()
@@ -15,68 +15,81 @@ muted4 = False
 colorkey = (255, 0, 255)
 screen_scale = 2
 screen_size = (256, 224)
-screen_size_scaled = (screen_size[0]*screen_scale, screen_size[1]*screen_scale)
+screen_size_scaled = (screen_size[0] * screen_scale,
+                      screen_size[1] * screen_scale)
 screen_color = (0, 0, 0)
 screen = pygame.display.set_mode(screen_size_scaled)
 screen_surface = pygame.Surface(screen_size)
 screen_rect = screen_surface.get_rect()
 
+print()
+
 pygame.display.set_caption("Proto Man")
-sprite_index = "assets/sprites/"
-audio_index = "assets/audio/"
-music_index = audio_index+"music/"
-sfx_index = audio_index+"sfx/"
+base_path = os.path.join(os.getcwd(), os.path.dirname(__file__))
+sprites_path = os.path.join(base_path, "assets/sprites/")
+audio_path = os.path.join(base_path, "assets/audio/")
+music_path = os.path.join(audio_path, "music/")
+sfx_path = os.path.join(audio_path, "sfx/")
 
 folder_names = [
-    'SQUARE1',
-    'SQUARE2',
-    'TRIANGLE',
-    'NOISE',
+  "SQUARE1",
+  "SQUARE2",
+  "TRIANGLE",
+  "NOISE",
 ]
 
+
 def load_sprite(sprite):
-    return pygame.image.load(sprite_index+sprite).convert()
+  return pygame.image.load(sprites_path + sprite).convert()
+
+
 def load_sound(folder_index, sound):
-    return pygame.mixer.Sound(sfx_index+folder_names[folder_index]+'/'+sound+'.WAV')
+  path = sfx_path + folder_names[folder_index] + "/" + sound + ".wav"
+  return pygame.mixer.Sound(path)
+
+
 def load_music(folder_index, music):
-    return pygame.mixer.Sound(music_index+folder_names[folder_index]+'/'+music+'.WAV')
+  path = music_path + folder_names[folder_index] + "/" + music + ".wav"
+  print("Loading " + path)
+  return pygame.mixer.Sound(path)
 
-select1 = load_music(0, 'select_new')
-select2 = load_music(1, 'select_new')
-select3 = load_music(2, 'select_new')
-select4 = load_music(3, 'select_new')
 
-boss_intro1 = load_music(0, 'boss_intro')
-boss_intro2 = load_music(1, 'boss_intro')
-boss_intro3 = load_music(2, 'boss_intro')
-boss_intro4 = load_music(3, 'boss_intro')
+select1 = load_music(0, "select_new")
+select2 = load_music(1, "select_new")
+select3 = load_music(2, "select_new")
+select4 = load_music(3, "select_new")
 
-boss_battle_intro1 = load_music(0, 'boss_battle_intro')
-boss_battle_intro2 = load_music(1, 'boss_battle_intro')
-boss_battle_intro3 = load_music(2, 'boss_battle_intro')
-boss_battle_intro4 = load_music(3, 'boss_battle_intro')
+boss_intro1 = load_music(0, "boss_intro")
+boss_intro2 = load_music(1, "boss_intro")
+boss_intro3 = load_music(2, "boss_intro")
+boss_intro4 = load_music(3, "boss_intro")
 
-boss_battle1 = load_music(0, 'boss_battle')
-boss_battle2 = load_music(1, 'boss_battle')
-boss_battle3 = load_music(2, 'boss_battle')
-boss_battle4 = load_music(3, 'boss_battle')
+boss_battle_intro1 = load_music(0, "boss_battle_intro")
+boss_battle_intro2 = load_music(1, "boss_battle_intro")
+boss_battle_intro3 = load_music(2, "boss_battle_intro")
+boss_battle_intro4 = load_music(3, "boss_battle_intro")
 
-fireman_intro1 = load_music(0, 'fireman_intro')
-fireman_intro2 = load_music(1, 'fireman_intro')
-fireman_intro3 = load_music(2, 'fireman_intro')
-fireman_intro4 = load_music(3, 'fireman_intro')
+boss_battle1 = load_music(0, "boss_battle")
+boss_battle2 = load_music(1, "boss_battle")
+boss_battle3 = load_music(2, "boss_battle")
+boss_battle4 = load_music(3, "boss_battle")
 
-fireman1 = load_music(0, 'fireman')
-fireman2 = load_music(1, 'fireman')
-fireman3 = load_music(2, 'fireman')
-fireman4 = load_music(3, 'fireman')
+fireman_intro1 = load_music(0, "fireman_intro")
+fireman_intro2 = load_music(1, "fireman_intro")
+fireman_intro3 = load_music(2, "fireman_intro")
+fireman_intro4 = load_music(3, "fireman_intro")
 
-proto = load_music(0, 'proto')
+fireman1 = load_music(0, "fireman")
+fireman2 = load_music(1, "fireman")
+fireman3 = load_music(2, "fireman")
+fireman4 = load_music(3, "fireman")
 
-bugtest1 = load_music(0, 'bugtest')
-bugtest2 = load_music(1, 'bugtest')
-bugtest3 = load_music(2, 'bugtest')
-bugtest4 = load_music(3, 'bugtest')
+proto = load_music(0, "proto")
+
+bugtest1 = load_music(0, "bugtest")
+bugtest2 = load_music(1, "bugtest")
+bugtest3 = load_music(2, "bugtest")
+bugtest4 = load_music(3, "bugtest")
 
 square1 = pygame.mixer.Channel(0)
 square1_END = pygame.USEREVENT + 1
@@ -103,29 +116,29 @@ sfx4 = pygame.mixer.Channel(7)
 sfx4_END = pygame.USEREVENT + 8
 sfx4.set_endevent(sfx4_END)
 
-sfx_select = load_sound(1, 'select')
-sfx_confirm1 = load_sound(0, 'confirm')
-sfx_confirm2 = load_sound(1, 'confirm')
-sfx_entrance = load_sound(1, 'entrance')
-sfx_land2 = load_sound(1, 'land')
-sfx_land4 = load_sound(3, 'land')
-sfx_shot = load_sound(1, 'shot')
-sfx_hit3 = load_sound(2, 'hit')
-sfx_hit4 = load_sound(3, 'hit')
-sfx_hurt2 = load_sound(1, 'hurt')
-sfx_hurt4 = load_sound(3, 'hurt')
-sfx_death1 = load_sound(0, 'death')
-sfx_death2 = load_sound(1, 'death')
-sfx_lightning_ball = load_sound(3, 'lightning_ball')
-sfx_deflect = load_sound(1, 'deflect')
-sfx_enemy_shot = load_sound(1, 'enemy_shot')
-sfx_health1 = load_sound(0, 'health')
-sfx_health2 = load_sound(1, 'health')
-sfx_life = load_sound(1, 'life')
-sfx_fall = load_sound(1, 'fall')
-sfx_explosion2 = load_sound(1, 'explosion')
-sfx_explosion4 = load_sound(3, 'explosion')
-sfx_menu = load_sound(1, 'menu')
+sfx_select = load_sound(1, "select")
+sfx_confirm1 = load_sound(0, "confirm")
+sfx_confirm2 = load_sound(1, "confirm")
+sfx_entrance = load_sound(1, "entrance")
+sfx_land2 = load_sound(1, "land")
+sfx_land4 = load_sound(3, "land")
+sfx_shot = load_sound(1, "shot")
+sfx_hit3 = load_sound(2, "hit")
+sfx_hit4 = load_sound(3, "hit")
+sfx_hurt2 = load_sound(1, "hurt")
+sfx_hurt4 = load_sound(3, "hurt")
+sfx_death1 = load_sound(0, "death")
+sfx_death2 = load_sound(1, "death")
+sfx_lightning_ball = load_sound(3, "lightning_ball")
+sfx_deflect = load_sound(1, "deflect")
+sfx_enemy_shot = load_sound(1, "enemy_shot")
+sfx_health1 = load_sound(0, "health")
+sfx_health2 = load_sound(1, "health")
+sfx_life = load_sound(1, "life")
+sfx_fall = load_sound(1, "fall")
+sfx_explosion2 = load_sound(1, "explosion")
+sfx_explosion4 = load_sound(3, "explosion")
+sfx_menu = load_sound(1, "menu")
 
 square1.play(select1, -1)
 square2.play(select2, -1)
@@ -133,37 +146,38 @@ triangle.play(select3, -1)
 noise.play(select4, -1)
 
 sprites_path = {
-    "portrait":load_sprite("portrait.PNG"),
-    "chars":load_sprite("chars.PNG"),
-    "background":load_sprite("background.PNG"),
-    "white":load_sprite("white.PNG"),
-    "intro":load_sprite("boss_intro.PNG"),
-    "zeus":load_sprite("zeus.PNG"),
-    "proto":load_sprite("proto.PNG"),
-    "tile":load_sprite("tiles.PNG"),
-    "life":load_sprite("life.PNG"),
-    "met":load_sprite("met.PNG"),
-    "effects":load_sprite("effects.PNG"),
-    "helikoppa":load_sprite("helikoppa.PNG"),
-    "explosion":load_sprite("explosion.PNG"),
-    "menu":load_sprite("menu.PNG"),
+    "portrait": load_sprite("portrait.PNG"),
+    "chars": load_sprite("chars.PNG"),
+    "background": load_sprite("background.PNG"),
+    "white": load_sprite("white.PNG"),
+    "intro": load_sprite("boss_intro.PNG"),
+    "zeus": load_sprite("zeus.PNG"),
+    "proto": load_sprite("proto.PNG"),
+    "tile": load_sprite("tiles.PNG"),
+    "life": load_sprite("life.PNG"),
+    "met": load_sprite("met.PNG"),
+    "effects": load_sprite("effects.PNG"),
+    "helikoppa": load_sprite("helikoppa.PNG"),
+    "explosion": load_sprite("explosion.PNG"),
+    "menu": load_sprite("menu.PNG"),
 }
 
 charsCoords = {}
-charsOrder = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!?.,c:;\'" '
+charsOrder = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!?.,c:;'\" "
 x = 0
 y = 0
 charsWidth = 80
-charsHeight= 80
+charsHeight = 80
 for index in range(len(charsOrder)):
-    if x > charsWidth/8-1:
+    if x > charsWidth / 8 - 1:
         x = 0
         y += 1
     c = charsOrder[index]
     charsCoords[c] = {}
-    charsCoords[c]['x'] = x
-    charsCoords[c]['y'] = y
+    charsCoords[c]["x"] = x
+    charsCoords[c]["y"] = y
     x += 1
+
 
 class Rectangle(object):
     def __init__(self, left, top, right, bottom):
@@ -171,8 +185,11 @@ class Rectangle(object):
         self.right = right
         self.top = top
         self.bottom = bottom
+
     def intersect(a, b):
         return a.left < b.right and a.right > b.left and a.top < b.bottom and a.bottom > b.top
+
+
 screen_rect = Rectangle(0, 0, screen_size[0], screen_size[1])
 
 sprites = []
@@ -180,8 +197,13 @@ updates = []
 rectangles = []
 portraits = []
 tiles = []
+
+
 class Star(object):
-    def __init__(self, x=random.randint(0, screen_size[0]), y=screen_size[1], t=2):
+    def __init__(self,
+                 x=random.randint(0, screen_size[0]),
+                 y=screen_size[1],
+                 t=2):
         if t == 2:
             width = 4
             height = 4
@@ -200,9 +222,11 @@ class Star(object):
             subX = 6
             subY = 8
             speed = 0.1
-        self.sprite = Sprite(x, y, width, height, 0, "intro", subX, subY, width, height)
+        self.sprite = Sprite(x, y, width, height, 0, "intro", subX, subY,
+                             width, height)
         self.sprite.update = self.update
         self.sprite.speed = speed
+
     def update(self):
         self.sprite.x -= self.sprite.speed
         self.sprite.y -= self.sprite.speed
@@ -210,9 +234,11 @@ class Star(object):
             self.sprite.x = screen_size[0]
         if self.sprite.y < -self.sprite.height:
             self.sprite.y = screen_size[1]
+
+
 class BossIntroPreview(object):
     def __init__(self):
-        self.sprite = Sprite(103, 128-50, 48, 48, 2, "zeus")
+        self.sprite = Sprite(103, 128 - 50, 48, 48, 2, "zeus")
         self.sprite.update = self.update
         self.sprite.gravity = 0.4
         self.sprite.velocityX = 1
@@ -229,6 +255,7 @@ class BossIntroPreview(object):
         self.sprite.fade_index = 4
         self.sprite.idle = True
         self.sprite.idle_limit = 120
+
     def update(self):
         if self.sprite.idle:
             self.sprite.timer += 1
@@ -245,20 +272,23 @@ class BossIntroPreview(object):
                     self.sprite.fade_index = 0
                     self.sprite.fading = False
         else:
-            if self.sprite.frame_index < len(self.sprite.frames)-1:
+            if self.sprite.frame_index < len(self.sprite.frames) - 1:
                 self.sprite.timer += 1
-                if self.sprite.timer >= self.sprite.limits[self.sprite.frame_index]:
+                if self.sprite.timer >= self.sprite.limits[
+                        self.sprite.frame_index]:
                     self.sprite.timer = 0
                     self.sprite.frame_index += 1
             self.sprite.indexX = self.sprite.frames[self.sprite.frame_index]
-            self.sprite.subX = self.sprite.indexX*self.sprite.width
+            self.sprite.subX = self.sprite.indexX * self.sprite.width
+
+
 class BossIntro(object):
     def __init__(self):
         self.part_width = 32
         self.part_height = 8
         self.parts_top = []
         self.parts_bottom = []
-        self.parts_placed = int(screen_size[0]/self.part_width)
+        self.parts_placed = int(screen_size[0] / self.part_width)
         self.fading = True
         self.timer = 0
         self.fade_limit = 5
@@ -273,7 +303,6 @@ class BossIntro(object):
             (128, 128, 2),
             (32, 176, 2),
             (224, 224, 2),
-
             (50, 150, 1),
             (100, 200, 1),
             (150, 100, 1),
@@ -283,7 +312,6 @@ class BossIntro(object):
             (125, 175, 1),
             (75, 125, 1),
             (225, 75, 1),
-
             (32, 224, 0),
             (64, 32, 0),
             (96, 182, 0),
@@ -291,7 +319,6 @@ class BossIntro(object):
             (160, 56, 0),
             (192, 100, 0),
             (224, 200, 0),
-
             (48, 150, 0),
             (80, 224, 0),
             (112, 0, 0),
@@ -315,16 +342,20 @@ class BossIntro(object):
         self.ended = False
         self.naming = True
         self.exceeded = False
-        self.boss_text = 'ZEUS'
-        self.bg_rect = Sprite_Rect(0, screen_size[1]/2+1, screen_size[0], 1, 1, (110, 0, 64))
+        self.boss_text = "ZEUS"
+        self.bg_rect = Sprite_Rect(0, screen_size[1] / 2 + 1, screen_size[0],
+                                   1, 1, (110, 0, 64))
         self.preview = BossIntroPreview().sprite
         for p in range(self.parts_placed):
-            pt = Sprite(p*self.part_width, screen_size[1]/2-self.part_height, self.part_width, self.part_height, 3, "intro")
-            pb = Sprite(p*self.part_width, screen_size[1]/2, self.part_width, self.part_height, 3, "intro")
+            pt = Sprite(p * self.part_width,
+                        screen_size[1] / 2 - self.part_height, self.part_width,
+                        self.part_height, 3, "intro")
+            pb = Sprite(p * self.part_width, screen_size[1] / 2,
+                        self.part_width, self.part_height, 3, "intro")
             pt.direction = -1
-            pt.limit = pt.y+32*pt.direction
+            pt.limit = pt.y + 32 * pt.direction
             pb.direction = 1
-            pb.limit = pb.y+32*pb.direction
+            pb.limit = pb.y + 32 * pb.direction
             pt.speed = 2
             pb.speed = 2
             pt.fade_index = 4
@@ -332,6 +363,7 @@ class BossIntro(object):
             self.parts_top.append(pt)
             self.parts_bottom.append(pb)
         updates.append(self)
+
     def remove(self):
         self.bg_rect.remove()
         for star in self.stars:
@@ -343,6 +375,7 @@ class BossIntro(object):
             part.remove()
         self.name.remove()
         updates.remove(self)
+
     def update(self):
         global introducing
         if not self.ended:
@@ -357,7 +390,8 @@ class BossIntro(object):
                 if self.name_timer >= self.name_limit:
                     self.name_timer = 0
                     self.naming = False
-                    self.name = ScreenText(128-len(self.boss_text)*4, 128, self.boss_text, True, 3)
+                    self.name = ScreenText(128 - len(self.boss_text) * 4, 128,
+                                           self.boss_text, True, 3)
             if self.star_fade_index > 0:
                 self.star_timer += 1
                 if self.star_timer >= self.star_limit:
@@ -387,9 +421,10 @@ class BossIntro(object):
                     part.y += part.speed
                     if part.y > part.limit:
                         part.y = part.limit
-                self.bg_rect.y = self.parts_top[0].y+self.part_height+1
+                self.bg_rect.y = self.parts_top[0].y + self.part_height + 1
                 self.bg_rect.width = int(screen_size[0])
-                self.bg_rect.height = int(self.parts_bottom[0].y-self.bg_rect.y-1)
+                self.bg_rect.height = int(self.parts_bottom[0].y -
+                                          self.bg_rect.y - 1)
             if self.exceeded:
                 self.timer += 1
                 if self.timer >= self.light_limit:
@@ -412,6 +447,8 @@ class BossIntro(object):
                             part.subX = self.part_width
                         else:
                             part.subX = 0
+
+
 class Sprite_Rect(object):
     def __init__(self, x, y, width, height, depth, color):
         self.x = x
@@ -423,10 +460,11 @@ class Sprite_Rect(object):
         self.rect = pygame.Rect(x, y, width, height)
         self.visible = True
         self.fade_index = 0
-        self.type = 'rectangle'
+        self.type = "rectangle"
         sprites.append(self)
         rectangles.append(self)
         updates.append(self)
+
     def remove(self):
         updates.remove(self)
         try:
@@ -434,13 +472,26 @@ class Sprite_Rect(object):
         except ValueError:
             print("Glitch averted.")
         rectangles.remove(self)
+
     def update(self):
         self.rect.x = self.x
         self.rect.y = self.y
         self.rect.width = self.width
         self.rect.height = self.height
+
+
 class Sprite(object):
-    def __init__(self, x, y, width, height, depth, path, subX=0, subY=0, subWidth=0, subHeight=0):
+    def __init__(self,
+                 x,
+                 y,
+                 width,
+                 height,
+                 depth,
+                 path,
+                 subX=0,
+                 subY=0,
+                 subWidth=0,
+                 subHeight=0):
         if subWidth == 0:
             subWidth = width
         if subHeight == 0:
@@ -458,29 +509,37 @@ class Sprite(object):
         self.flip_y = False
         self.depth = depth
         self.path = path
-        self.indexX = self.subX/self.subWidth
-        self.indexY = self.subY/self.subHeight
-        self.surface = sprites_path[self.path].subsurface(subX, subY, subWidth, subHeight).convert()
+        self.indexX = self.subX / self.subWidth
+        self.indexY = self.subY / self.subHeight
+        self.surface = sprites_path[self.path].subsurface(
+            subX, subY, subWidth, subHeight).convert()
         self.rect = self.surface.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
         self.visible = True
         self.fade_index = 0
-        self.type = 'surface'
+        self.type = "surface"
         sprites.append(self)
         updates.append(self)
+
     def updateSprite(self, indexX, indexY):
         self.indexX = indexX
         self.indexY = indexY
-        self.surface = sprites_path[self.path].subsurface(self.indexX*self.width, self.indexY*self.height, self.width, self.height)
+        self.surface = sprites_path[self.path].subsurface(
+            self.indexX * self.width, self.indexY * self.height, self.width,
+            self.height)
+
     def update(self):
         print
+
     def remove(self):
         try:
             sprites.remove(self)
             updates.remove(self)
         except ValueError:
             print("Glitch averted.")
+
+
 class ScreenText(object):
     def __init__(self, x, y, string, shadow, timer=0):
         self.x = x
@@ -496,72 +555,85 @@ class ScreenText(object):
             updates.append(self)
         else:
             self.draw()
+
     def phase(self, visibility=None):
         if visibility == None:
             visibility = not self.visible
         self.visible = visibility
         for char in self.chars:
             char.visible = visibility
+
     def erase(self):
         for char in self.chars:
             char.remove()
         self.chars = []
+
     def draw(self):
         i = 0
         for char in self.string:
-            indexY = charsCoords[char]['y']
+            indexY = charsCoords[char]["y"]
             if self.shadow:
                 indexY += 5
-            c = Sprite(self.x+8*i, self.y, 8, 8, 10, "chars", charsCoords[char]['x']*8, indexY*8, 8, 8)
+            c = Sprite(self.x + 8 * i, self.y, 8, 8, 10, "chars",
+                       charsCoords[char]["x"] * 8, indexY * 8, 8, 8)
             c.on_level = True
             c.offset_x = c.x
             c.offset_y = c.y
             self.chars.append(c)
             i += 1
+
     def redraw(self, string):
         self.erase()
         self.x = 0
         self.y = 0
         self.string = string
         self.draw()
+
     def move(self, x, y):
         self.x = x
         self.y = y
         for char in self.chars:
             char.x = self.x + char.offset_x
             char.y = self.y + char.offset_y
+
     def remove(self):
         for char in self.chars:
             char.remove()
         if self.limit > 0:
             updates.remove(self)
+
     def update(self):
         if self.char_index < len(self.string):
             self.timer += 1
             if self.timer >= self.limit:
                 self.timer = 0
                 char = self.string[self.char_index]
-                indexY = charsCoords[char]['y']
+                indexY = charsCoords[char]["y"]
                 if self.shadow:
                     indexY += 5
-                self.chars.append(Sprite(self.x+8*self.char_index, self.y, 8, 8, 1, "chars", charsCoords[char]['x']*8, indexY*8, 8, 8))
+                self.chars.append(
+                    Sprite(self.x + 8 * self.char_index, self.y, 8, 8, 1,
+                           "chars", charsCoords[char]["x"] * 8, indexY * 8, 8,
+                           8))
                 self.char_index += 1
+
+
 class Portrait(object):
     def __init__(self, index, selected):
         if selected == None:
             sele
         index_y = 0
         if index <= 1:
-            index_x = index+0.5
+            index_x = index + 0.5
             index_y = 0
         elif index <= 4:
-            index_x = index-2
+            index_x = index - 2
             index_y = 1
         elif index <= 6:
-            index_x = index-4.5
+            index_x = index - 4.5
             index_y = 2
-        x = index_x*80+24
-        y = index_y*64+16
+        x = index_x * 80 + 24
+        y = index_y * 64 + 16
         self.sprite = Sprite(x, y, 48, 48, 2, "portrait")
         self.sprite.selected = selected
         if index == 0:
@@ -574,10 +646,13 @@ class Portrait(object):
             self.sprite.index_face = 3
         self.sprite.timer = 0
         self.sprite.limit = 10
-        self.sprite.surface_face = Sprite(x+8, y, 32, 40, 3, "portrait", self.sprite.index_face*32, 48, 32, 40)
+        self.sprite.surface_face = Sprite(x + 8, y, 32, 40, 3, "portrait",
+                                          self.sprite.index_face * 32, 48, 32,
+                                          40)
         self.sprite.surface_face.index = self.sprite.index_face
         portraits.append(self.sprite)
         self.sprite.update = self.update
+
     def update(self):
         if self.sprite.selected:
             self.sprite.timer += 1
@@ -591,11 +666,13 @@ class Portrait(object):
                 self.sprite.subX = 0
                 self.sprite.timer = 0
 
+
 class Shot(object):
-    def __init__(self, x, y, parent, angle, damage, piercing, shot_type, enemies):
-        if shot_type == 'proto':
+    def __init__(self, x, y, parent, angle, damage, piercing, shot_type,
+                 enemies):
+        if shot_type == "proto":
             subY = 32
-        elif shot_type == 'met':
+        elif shot_type == "met":
             subY = 24
         self.sprite = Sprite(x, y, 8, 8, 3, shot_type, 0, subY, 8, 8)
         self.sprite.update = self.update
@@ -603,10 +680,10 @@ class Shot(object):
         self.parent = parent
         self.speed = self.parent.shot_speed
         self.angle = angle
-        self.radians = (self.angle-90)*math.pi/180
+        self.radians = (self.angle - 90) * math.pi / 180
         self.shot_type = shot_type
-        self.velocity_x = math.cos(self.radians)*self.speed
-        self.velocity_y = math.sin(self.radians)*self.speed
+        self.velocity_x = math.cos(self.radians) * self.speed
+        self.velocity_y = math.sin(self.radians) * self.speed
         if self.velocity_x < 0:
             self.direction = -1
         elif self.velocity_x > 0:
@@ -616,24 +693,21 @@ class Shot(object):
         self.enemies = enemies
         self.damage = damage
         self.piercing = piercing
-        self.rect = Rectangle(
-            self.sprite.x,
-            self.sprite.y,
-            self.sprite.x+self.sprite.width,
-            self.sprite.y+self.sprite.height
-        )
+        self.rect = Rectangle(self.sprite.x, self.sprite.y,
+                              self.sprite.x + self.sprite.width,
+                              self.sprite.y + self.sprite.height)
         self.deflecting = False
         self.deflect_speed = 4
+
     def update_rect(self):
-        self.rect = Rectangle(
-            self.sprite.x,
-            self.sprite.y,
-            self.sprite.x+self.sprite.width,
-            self.sprite.y+self.sprite.height
-        )
+        self.rect = Rectangle(self.sprite.x, self.sprite.y,
+                              self.sprite.x + self.sprite.width,
+                              self.sprite.y + self.sprite.height)
+
     def remove(self):
         self.parent.shots_fired -= 1
         self.sprite.remove()
+
     def update(self):
         if not game == None:
             if not game.paused:
@@ -647,7 +721,7 @@ class Shot(object):
                         if self.rect.intersect(enemy.rect):
                             if not enemy.invincible and not enemy.dead:
                                 if not enemy.shielded:
-                                    if self.shot_type == 'proto':
+                                    if self.shot_type == "proto":
                                         sfx3.play(sfx_hit3)
                                         sfx4.play(sfx_hit4)
                                     else:
@@ -662,60 +736,71 @@ class Shot(object):
                                     if not sfx2.get_sound() == sfx_life:
                                         sfx2.play(sfx_deflect)
                                     self.deflecting = True
-                                    self.velocity_x = self.deflect_speed*-self.direction
+                                    self.velocity_x = self.deflect_speed * -self.direction
                                     self.velocity_y = -self.deflect_speed
+
+
 class Tile(object):
-    def __init__(self, x, y, subX, subY, solid=False, through=False, ladder=False):
+    def __init__(self,
+                 x,
+                 y,
+                 subX,
+                 subY,
+                 solid=False,
+                 through=False,
+                 ladder=False):
         global tiles
         self.offset_x = x
-        self.sprite = Sprite(x, y, tile_size, tile_size, 1, "tile", subX*tile_size, subY*tile_size, tile_size, tile_size)
+        self.sprite = Sprite(x, y, tile_size, tile_size, 1, "tile",
+                             subX * tile_size, subY * tile_size, tile_size,
+                             tile_size)
         self.sprite.update = self.update
         self.sprite.on_level = True
         self.tile_x = subX
         self.tile_y = subY
-        self.rect = Rectangle(x, y, x+tile_size, y+tile_size)
+        self.rect = Rectangle(x, y, x + tile_size, y + tile_size)
         self.solid = solid
         self.through = through
         self.ladder = ladder
         tiles.append(self)
+
     def transfer(self, direction):
-        current_x = int(self.sprite.x/tile_size)
-        current_y = int((self.sprite.y+8)/tile_size)
-        moves = int((screen_size[0]/tile_size+1)*direction)
+        current_x = int(self.sprite.x / tile_size)
+        current_y = int((self.sprite.y + 8) / tile_size)
+        moves = int((screen_size[0] / tile_size + 1) * direction)
         try:
-            char = game.map[current_y][current_x+moves]
+            char = game.map[current_y][current_x + moves]
         except IndexError:
-            char = ' '
-        self.sprite.x += moves*tile_size
-        if char == 'm':
+            char = " "
+        self.sprite.x += moves * tile_size
+        if char == "m":
             game.enemies.append(Met((self.sprite.x, self.sprite.y)))
-        if char == 'h':
+        if char == "h":
             game.enemies.append(Helikoppa((self.sprite.x, self.sprite.y)))
-        self.sprite.subX = game.parser[char]['index']*tile_size
-        self.solid = game.parser[char]['solid']
-        self.through = game.parser[char]['through']
-        self.ladder = game.parser[char]['ladder']
+        self.sprite.subX = game.parser[char]["index"] * tile_size
+        self.solid = game.parser[char]["solid"]
+        self.through = game.parser[char]["through"]
+        self.ladder = game.parser[char]["ladder"]
         self.update_rect()
+
     def update_rect(self):
         x = self.sprite.x
         y = self.sprite.y
-        self.rect = Rectangle(
-            x,
-            y,
-            x+tile_size,
-            y+tile_size
-        )
+        self.rect = Rectangle(x, y, x + tile_size, y + tile_size)
+
     def update(self):
         if not game == None:
             if not game.paused:
                 if not self.rect.intersect(game.rect):
-                    if self.sprite.x+self.sprite.width/2 < game.rect.left:
+                    if self.sprite.x + self.sprite.width / 2 < game.rect.left:
                         self.transfer(1)
-                    elif self.sprite.x+self.sprite.width/2 > game.rect.right:
+                    elif self.sprite.x + self.sprite.width / 2 > game.rect.right:
                         self.transfer(-1)
+
+
 class HUDBar(object):
     def __init__(self, x, y, ticks, ticks_max, index):
-        self.sprite = Sprite(x, y, 8, 56, 8, 'life')
+        self.sprite = Sprite(x, y, 8, 56, 8, "life")
         self.sprite.update = self.update
         self.sprite.on_level = True
         self.offset_x = x
@@ -724,6 +809,7 @@ class HUDBar(object):
         self.ticks_list = []
         self.index = index
         self.update_ticks(self.ticks)
+
     def update_ticks(self, ticks):
         if ticks > self.ticks_max:
             ticks = self.ticks_max
@@ -733,27 +819,31 @@ class HUDBar(object):
         self.ticks_list = []
         for i in range(ticks):
             x = self.sprite.x
-            y = self.sprite.y+self.sprite.height-2*(i+1)
-            tick = Sprite(x, y, 8, 52, 8, 'life', 8, self.index, 8, 1)
+            y = self.sprite.y + self.sprite.height - 2 * (i + 1)
+            tick = Sprite(x, y, 8, 52, 8, "life", 8, self.index, 8, 1)
             tick.on_level = True
             self.ticks_list.append(tick)
+
     def remove(self):
         for tick in self.ticks_list:
             tick.remove()
         self.sprite.remove()
+
     def update(self):
         if not game == None:
             if not game.paused:
                 self.update_ticks(self.ticks)
+
+
 class Smoke(object):
     def __init__(self, pos, direction, smoke_type):
         x, y = pos
-        if smoke_type == 'hurt':
+        if smoke_type == "hurt":
             subY = 24
-        if smoke_type == 'slide':
+        if smoke_type == "slide":
             subY = 32
-        self.sprite = Sprite(x, y, 8, 8, 4, 'effects', 0, subY, 8, 8)
-        if smoke_type == 'slide':
+        self.sprite = Sprite(x, y, 8, 8, 4, "effects", 0, subY, 8, 8)
+        if smoke_type == "slide":
             if direction == -1:
                 self.sprite.flip_x = True
         self.sprite.update = self.update
@@ -762,6 +852,7 @@ class Smoke(object):
         self.limit = 8
         self.index = 0
         self.indexes = 3
+
     def update(self):
         if not game == None:
             if not game.paused:
@@ -772,35 +863,41 @@ class Smoke(object):
                     self.index += 1
                     if self.index >= self.indexes:
                         self.sprite.remove()
-                self.sprite.subX = self.index*8
+                self.sprite.subX = self.index * 8
+
+
 class HurtEffect(object):
     def __init__(self, parent):
-        x = parent.center['x']-12
-        y = parent.center['y']-12
-        self.sprite = Sprite(x, y, 24, 24, 7, 'effects', 0, 0, 24, 24)
+        x = parent.center["x"] - 12
+        y = parent.center["y"] - 12
+        self.sprite = Sprite(x, y, 24, 24, 7, "effects", 0, 0, 24, 24)
         self.sprite.update = self.update
         self.sprite.on_level = True
         self.parent = parent
         self.sprite.visible = not self.parent.sprite.visible
+
     def update(self):
         if not game == None:
             if not game.paused:
-                self.sprite.x = self.parent.center['x']-12
-                self.sprite.y = self.parent.center['y']-12
+                self.sprite.x = self.parent.center["x"] - 12
+                self.sprite.y = self.parent.center["y"] - 12
                 self.sprite.visible = not self.parent.sprite.visible
                 if not self.parent.hurt:
                     self.sprite.remove()
+
+
 class SmallExplosion(object):
     def __init__(self, pos):
-        x = pos[0]-12
-        y = pos[1]-12
-        self.sprite = Sprite(x, y, 24, 24, 7, 'effects', 24, 0, 24, 24)
+        x = pos[0] - 12
+        y = pos[1] - 12
+        self.sprite = Sprite(x, y, 24, 24, 7, "effects", 24, 0, 24, 24)
         self.sprite.update = self.update
         self.sprite.on_level = True
         self.timer = 0
         self.limit = 3
         self.index = 0
         self.indexes = 4
+
     def update(self):
         if not game == None:
             if not game.paused:
@@ -810,41 +907,43 @@ class SmallExplosion(object):
                     self.index += 1
                     if self.index >= self.indexes:
                         self.sprite.remove()
-                self.sprite.subY = self.index*self.sprite.height
+                self.sprite.subY = self.index * self.sprite.height
+
+
 class Explosion(object):
     def __init__(self, pos):
-        x = pos[0]-32
-        y = pos[1]-32
-        self.sprite = Sprite(x, y, 64, 64, 7, 'explosion', 0, 0, 64, 64)
+        x = pos[0] - 32
+        y = pos[1] - 32
+        self.sprite = Sprite(x, y, 64, 64, 7, "explosion", 0, 0, 64, 64)
         self.sprite.update = self.update
         self.sprite.on_level = True
         self.timer = 0
         self.limit = 2
         self.index = 0
-        self.indexes = sprites_path[self.sprite.path].get_rect().width/self.sprite.subWidth
+        self.indexes = sprites_path[
+            self.sprite.path].get_rect().width / self.sprite.subWidth
         self.rect_offset_x1 = 20
         self.rect_offset_x2 = 44
         self.rect_offset_y1 = 20
         self.rect_offset_y2 = 44
-        self.rect_width = self.rect_offset_x2-self.rect_offset_x1
-        self.rect_height = self.rect_offset_y2-self.rect_offset_y1
-        self.rect = Rectangle(
-            self.sprite.x+self.rect_offset_x1,
-            self.sprite.y+self.rect_offset_y1,
-            self.sprite.x+self.rect_offset_x2,
-            self.sprite.y+self.rect_offset_y2
-        )
+        self.rect_width = self.rect_offset_x2 - self.rect_offset_x1
+        self.rect_height = self.rect_offset_y2 - self.rect_offset_y1
+        self.rect = Rectangle(self.sprite.x + self.rect_offset_x1,
+                              self.sprite.y + self.rect_offset_y1,
+                              self.sprite.x + self.rect_offset_x2,
+                              self.sprite.y + self.rect_offset_y2)
         self.center = {
-            'x':self.rect.left+self.rect_width/2,
-            'y':self.rect.top+self.rect_height/2
+            "x": self.rect.left + self.rect_width / 2,
+            "y": self.rect.top + self.rect_height / 2
         }
         self.damage = 4
         sfx2.play(sfx_explosion2)
         sfx4.play(sfx_explosion4)
+
     def update(self):
         if not game == None:
             if not game.paused:
-                if self.index < self.indexes-4:
+                if self.index < self.indexes - 4:
                     if not game == None:
                         if not game.player == None:
                             if self.rect.intersect(game.player.rect):
@@ -860,48 +959,48 @@ class Explosion(object):
                     self.index += 1
                     if self.index >= self.indexes:
                         self.sprite.remove()
-                self.sprite.subX = self.index*self.sprite.width
+                self.sprite.subX = self.index * self.sprite.width
+
+
 class OrbExplosion(object):
     def __init__(self, pos):
-        x = pos[0]-12
-        y = pos[1]-12
+        x = pos[0] - 12
+        y = pos[1] - 12
         i = 0
         while i < 8:
-            angle = 45*i
+            angle = 45 * i
             Orb((x, y), angle, 1)
             Orb((x, y), angle, 2)
             i += 1
         sfx1.play(sfx_death1)
         if not sfx2.get_sound() == sfx_life:
             sfx2.play(sfx_death2)
+
+
 class Orb(object):
     def __init__(self, pos, angle, speed):
         x = pos[0]
         y = pos[1]
         self.speed = speed
         self.angle = angle
-        self.radians = angle*math.pi/180
-        self.sprite = Sprite(x, y, 24, 24, 7, 'effects', 24, 0, 24, 24)
+        self.radians = angle * math.pi / 180
+        self.sprite = Sprite(x, y, 24, 24, 7, "effects", 24, 0, 24, 24)
         self.sprite.update = self.update
         self.sprite.on_level = True
-        self.velocity_x = math.cos(self.radians)*self.speed
-        self.velocity_y = math.sin(self.radians)*self.speed
+        self.velocity_x = math.cos(self.radians) * self.speed
+        self.velocity_y = math.sin(self.radians) * self.speed
         self.index = 0
         self.timer = 0
         self.limit = 3
-        self.rect = Rectangle(
-            self.sprite.x,
-            self.sprite.y,
-            self.sprite.x+self.sprite.width,
-            self.sprite.y+self.sprite.height
-        )
+        self.rect = Rectangle(self.sprite.x, self.sprite.y,
+                              self.sprite.x + self.sprite.width,
+                              self.sprite.y + self.sprite.height)
+
     def update_rect(self):
-        self.rect = Rectangle(
-            self.sprite.x,
-            self.sprite.y,
-            self.sprite.x+self.sprite.width,
-            self.sprite.y+self.sprite.height
-        )
+        self.rect = Rectangle(self.sprite.x, self.sprite.y,
+                              self.sprite.x + self.sprite.width,
+                              self.sprite.y + self.sprite.height)
+
     def update(self):
         if not game == None:
             if not game.paused:
@@ -916,11 +1015,13 @@ class Orb(object):
                 self.update_rect()
                 if not self.rect.intersect(game.rect):
                     self.sprite.remove()
-                self.sprite.subY = self.index*self.sprite.height
+                self.sprite.subY = self.index * self.sprite.height
+
+
 class Player(object):
     def __init__(self, pos):
-        x = pos[0]*tile_size-8
-        y = pos[1]*tile_size-16
+        x = pos[0] * tile_size - 8
+        y = pos[1] * tile_size - 16
         self.sprite = Sprite(x, y, 22, 24, 2, "proto", 96, 0, 32, 32)
         self.sprite.update = self.update
         self.sprite.on_level = True
@@ -939,8 +1040,8 @@ class Player(object):
         self.rect_offset_x2 = 24
         self.rect_offset_y1 = 3
         self.rect_offset_y2 = 26
-        self.sprite.width = self.rect_offset_x2-self.rect_offset_x1
-        self.sprite.height = self.rect_offset_y2-self.rect_offset_y1
+        self.sprite.width = self.rect_offset_x2 - self.rect_offset_x1
+        self.sprite.height = self.rect_offset_y2 - self.rect_offset_y1
         self.direction = 1
         self.last_direction = self.direction
         self.facing = 1
@@ -954,7 +1055,7 @@ class Player(object):
         self.run_start = False
         self.run_start_timer = 0
         self.run_start_limit = 8
-        self.run_stop = False;
+        self.run_stop = False
         self.run_stop_timer = 0
         self.run_stop_limit = 4
         self.running = False
@@ -990,7 +1091,7 @@ class Player(object):
         self.shots_max = 3
         self.shot_speed = 4
         self.shot_direction = 1
-        self.shot_type = 'normal'
+        self.shot_type = "normal"
         self.shot_width = 8
         self.shot_height = 8
         self.shot_damage = 3
@@ -1000,24 +1101,21 @@ class Player(object):
         self.warp_limit = 2
         self.warp_speed = 8
         self.warp_x = self.sprite.x
-        self.warp_y = self.sprite.y-7
+        self.warp_y = self.sprite.y - 7
         self.warp_indexes = [2, 0, 1]
         self.warp_index = 0
         self.warp_line = True
         self.shielded = False
         self.sprite.y = -self.sprite.height
-        self.rect = Rectangle(
-            self.sprite.x+self.rect_offset_x1,
-            self.sprite.y+self.rect_offset_y1,
-            self.sprite.x+self.rect_offset_x2,
-            self.sprite.y+self.rect_offset_y2
-        )
+        self.rect = Rectangle(self.sprite.x + self.rect_offset_x1,
+                              self.sprite.y + self.rect_offset_y1,
+                              self.sprite.x + self.rect_offset_x2,
+                              self.sprite.y + self.rect_offset_y2)
         self.slide_rect = Rectangle(
-            self.sprite.x+self.rect_offset_x1,
-            self.sprite.y+self.rect_offset_y2-tile_size,
-            self.sprite.x+self.rect_offset_x2,
-            self.sprite.y+self.rect_offset_y2
-        )
+            self.sprite.x + self.rect_offset_x1,
+            self.sprite.y + self.rect_offset_y2 - tile_size,
+            self.sprite.x + self.rect_offset_x2,
+            self.sprite.y + self.rect_offset_y2)
         self.rect_last = self.rect
         self.idle_index = 0
         self.index_idle = 3
@@ -1049,40 +1147,41 @@ class Player(object):
         self.invincible_timer = 0
         self.invincible_limit = 90
         self.update_rect()
+
     def update_rect(self):
-        self.rect = Rectangle(
-            self.sprite.x+self.rect_offset_x1,
-            self.sprite.y+self.rect_offset_y1,
-            self.sprite.x+self.rect_offset_x2,
-            self.sprite.y+self.rect_offset_y2
-        )
+        self.rect = Rectangle(self.sprite.x + self.rect_offset_x1,
+                              self.sprite.y + self.rect_offset_y1,
+                              self.sprite.x + self.rect_offset_x2,
+                              self.sprite.y + self.rect_offset_y2)
         self.slide_rect = Rectangle(
-            self.sprite.x+self.rect_offset_x1,
-            self.sprite.y+self.rect_offset_y2-tile_size,
-            self.sprite.x+self.rect_offset_x2,
-            self.sprite.y+self.rect_offset_y2
-        )
-        if not (self.sliding or self.attacking or self.hanging or (self.running and self.grounded) or self.dead):
+            self.sprite.x + self.rect_offset_x1,
+            self.sprite.y + self.rect_offset_y2 - tile_size,
+            self.sprite.x + self.rect_offset_x2,
+            self.sprite.y + self.rect_offset_y2)
+        if not (self.sliding or self.attacking or self.hanging or
+                (self.running and self.grounded) or self.dead):
             self
-        self.center['x'] = self.rect.left+self.sprite.width/2
-        self.center['y'] = self.rect.top +self.sprite.height/2
+        self.center["x"] = self.rect.left + self.sprite.width / 2
+        self.center["y"] = self.rect.top + self.sprite.height / 2
+
     def kill(self, explosion=False):
         if not self.dead:
             self.dead = True
             if explosion:
-                OrbExplosion((self.center['x'], self.center['y']))
+                OrbExplosion((self.center["x"], self.center["y"]))
             square1.play(sfx_death1)
             square2.play(sfx_death2)
             triangle.stop()
             noise.stop()
             self.sprite.remove()
+
     def hit(self, damage, direction=0):
         if not self.invincible and not self.dead:
             if direction == 0:
                 direction = -self.facing
                 if self.direction == 0:
                     direction = 1
-            self.attacking=self.running=self.jumping=self.climbing=self.hanging=False
+            self.attacking = self.running = self.jumping = self.climbing = self.hanging = False
             if not self.overhead and self.sliding:
                 self.stop_sliding()
             self.velocity_y = 0
@@ -1101,9 +1200,13 @@ class Player(object):
                 self.kill(True)
             else:
                 HurtEffect(self)
-                Smoke((self.sprite.x+2, self.sprite.y-6), self.facing, 'hurt')
-                Smoke((self.sprite.x+14, self.sprite.y-10), self.facing, 'hurt')
-                Smoke((self.sprite.x+26, self.sprite.y-6), self.facing, 'hurt')
+                Smoke((self.sprite.x + 2, self.sprite.y - 6), self.facing,
+                      "hurt")
+                Smoke((self.sprite.x + 14, self.sprite.y - 10), self.facing,
+                      "hurt")
+                Smoke((self.sprite.x + 26, self.sprite.y - 6), self.facing,
+                      "hurt")
+
     def shoot(self):
         if self.hanging:
             facing = self.climb_fire_direction
@@ -1115,11 +1218,13 @@ class Player(object):
             sfx2.play(sfx_shot)
         self.attacking = True
         self.attack_timer = 0
-        shot_x = self.center['x']-self.shot_width/2+12*facing
-        shot_y = self.center['y']
-        shot = Shot(shot_x, shot_y, self, 90*facing, self.shot_damage, self.shot_piercing, 'proto', game.enemies)
+        shot_x = self.center["x"] - self.shot_width / 2 + 12 * facing
+        shot_y = self.center["y"]
+        shot = Shot(shot_x, shot_y, self, 90 * facing, self.shot_damage,
+                    self.shot_piercing, "proto", game.enemies)
         self.shots_fired += 1
         self.attacked = True
+
     def move(self, dx=0, dy=0):
         self.underfoot = []
         self.underfoot_climb = []
@@ -1129,8 +1234,8 @@ class Player(object):
         if not dy == 0: self.move_axis(0, dy)
         if self.rect.left < 0:
             self.sprite.x = -self.rect_offset_x1
-        if self.rect.right > len(game.map[0])*tile_size:
-            self.sprite.x = len(game.map[0])*tile_size-self.rect_offset_x2
+        if self.rect.right > len(game.map[0]) * tile_size:
+            self.sprite.x = len(game.map[0]) * tile_size - self.rect_offset_x2
         if self.rect.top > game.rect.bottom:
             self.kill()
         self.update_rect()
@@ -1156,12 +1261,11 @@ class Player(object):
             valid = False
             for tile in tiles:
                 if tile.ladder:
-                    if Rectangle(
-                        self.sprite.x+self.rect_offset_x1,
-                        self.sprite.y+self.rect_offset_y1,
-                        self.sprite.x+self.rect_offset_x2,
-                        self.sprite.y+self.rect_offset_y1+20
-                        ).intersect(tile.rect):
+                    if Rectangle(self.sprite.x + self.rect_offset_x1,
+                                 self.sprite.y + self.rect_offset_y1,
+                                 self.sprite.x + self.rect_offset_x2,
+                                 self.sprite.y + self.rect_offset_y1 +
+                                 20).intersect(tile.rect):
                         valid = True
                         break
             self.hanging = valid
@@ -1172,13 +1276,15 @@ class Player(object):
                     self.grounded = True
         for tile in tiles:
             if tile.solid:
-                if self.rect.intersect(tile.rect) and not self.slide_rect.intersect(tile.rect):
+                if self.rect.intersect(
+                        tile.rect) and not self.slide_rect.intersect(
+                            tile.rect):
                     self.overhead = True
         if not self.grounded and self.sliding:
             if self.sliding:
                 if self.overhead:
                     self.stop_sliding()
-                    self.sprite.y += self.slide_rect.top-self.rect.top
+                    self.sprite.y += self.slide_rect.top - self.rect.top
                     self.update_rect()
                 else:
                     self.stop_sliding()
@@ -1186,10 +1292,11 @@ class Player(object):
             self.stop_sliding()
         elif self.slide_timer == 1:
             if self.facing == -1:
-                x = self.rect.right-4
+                x = self.rect.right - 4
             if self.facing == 1:
-                x = self.rect.left+4
-            Smoke((x, self.rect.bottom-8), self.facing, 'slide')
+                x = self.rect.left + 4
+            Smoke((x, self.rect.bottom - 8), self.facing, "slide")
+
     def move_axis(self, dx, dy):
         self.sprite.x += dx
         self.sprite.y += dy
@@ -1199,36 +1306,34 @@ class Player(object):
             rect = self.slide_rect
         for tile in tiles:
             if tile.solid or tile.through:
-                if Rectangle(
-                    self.sprite.x+self.rect_offset_x1+4,
-                    self.sprite.y+self.rect_offset_y1,
-                    self.sprite.x+self.rect_offset_x2-4,
-                    self.sprite.y+32-5
-                    ).intersect(tile.rect):
+                if Rectangle(self.sprite.x + self.rect_offset_x1 + 4,
+                             self.sprite.y + self.rect_offset_y1,
+                             self.sprite.x + self.rect_offset_x2 - 4,
+                             self.sprite.y + 32 - 5).intersect(tile.rect):
                     if dy > 0:
                         self.underfoot_climb.append(tile)
             if rect.intersect(tile.rect):
                 if tile.solid:
                     if dx < 0:
-                        self.sprite.x = tile.rect.right-self.rect_offset_x1
+                        self.sprite.x = tile.rect.right - self.rect_offset_x1
                         self.update_rect()
                         if not self.rect.intersect(tile.rect):
                             self.slide_stopping = True
                     if dx > 0:
-                        self.sprite.x = tile.rect.left-self.rect_offset_x2
+                        self.sprite.x = tile.rect.left - self.rect_offset_x2
                         self.update_rect()
                         if not self.rect.intersect(tile.rect):
                             self.slide_stopping = True
                     if dy < 0:
-                        self.sprite.y = tile.rect.bottom-self.rect_offset_y1
+                        self.sprite.y = tile.rect.bottom - self.rect_offset_y1
                         self.velocity_y = 0.25
                     if dy > 0:
-                        self.sprite.y = tile.rect.top-self.rect_offset_y2
+                        self.sprite.y = tile.rect.top - self.rect_offset_y2
                         self.velocity_y = 0
                         self.underfoot.append(tile)
                 if tile.through and not self.hanging:
-                    if dy > 0 and rect.bottom >= tile.sprite.y and self.rect_last.bottom <= tile.sprite.y+8 and self.rect.right > tile.rect.left+6 and self.rect.left < tile.rect.right-6:
-                        self.sprite.y = tile.rect.top-self.rect_offset_y2
+                    if dy > 0 and rect.bottom >= tile.sprite.y and self.rect_last.bottom <= tile.sprite.y + 8 and self.rect.right > tile.rect.left + 6 and self.rect.left < tile.rect.right - 6:
+                        self.sprite.y = tile.rect.top - self.rect_offset_y2
                         self.velocity_y = 0
                         self.underfoot.append(tile)
                 self.update_rect()
@@ -1242,29 +1347,31 @@ class Player(object):
                 self.hit(enemy.damage, direction)
         for pickup in game.pickups:
             if rect.intersect(pickup.rect):
-                if pickup.type == 'health_big':
+                if pickup.type == "health_big":
                     game.refill_health = self.health + 10
                     game.refill_timer = 0
                     game.refilling = True
                     game.refill_recipient = self
-                if pickup.type == 'health_small':
+                if pickup.type == "health_small":
                     game.refill_health = self.health + 2
                     game.refill_timer = 0
                     game.refilling = True
                     game.refill_recipient = self
-                if pickup.type == 'life':
+                if pickup.type == "life":
                     self.lives += 1
                     if self.lives > 9:
                         self.lives = 9
                     sfx2.play(sfx_life)
                     self.life_text.redraw(str(self.lives))
                 pickup.destroy()
+
     def stop_sliding(self):
         if not self.overhead:
             self.sliding = False
             self.slide_timer = 0
             self.slide_anim_timer = 0
             self.slide_anim_index = 0
+
     def update(self):
         if not game == None:
             if not game.paused:
@@ -1280,16 +1387,17 @@ class Player(object):
                             if not sfx2.get_sound() == sfx_life:
                                 sfx2.play(sfx_entrance)
                         self.warp_timer += 1
-                        index = self.index_warp+self.warp_indexes[self.warp_index]
+                        index = self.index_warp + self.warp_indexes[
+                            self.warp_index]
                         if self.warp_timer >= self.warp_limit:
                             self.warp_timer = 0
                             self.warp_index += 1
-                            if self.warp_index > len(self.warp_indexes)-1:
-                                self.warp_index = len(self.warp_indexes)-1
+                            if self.warp_index > len(self.warp_indexes) - 1:
+                                self.warp_index = len(self.warp_indexes) - 1
                                 self.warping = False
                                 self.grounded = True
                                 index = self.index_idle
-                                self.sprite.y = self.warp_y+5
+                                self.sprite.y = self.warp_y + 5
                                 self.update_rect()
                     else:
                         self.sprite.y += self.warp_speed
@@ -1316,9 +1424,10 @@ class Player(object):
                                 self.run_index_direction = 1
                         if not self.hanging:
                             if not self.direction == 0:
-                                if self.grounded and not self.run_start and not self.running and not (self.sliding and self.overhead):
+                                if self.grounded and not self.run_start and not self.running and not (
+                                        self.sliding and self.overhead):
                                     if self.sliding and not self.direction == self.facing or not self.sliding:
-                                        self.velocity_x = 2*self.direction
+                                        self.velocity_x = 2 * self.direction
                                         self.run_start = True
                                         self.run_start_timer = 0
                                         self.run_stop = False
@@ -1347,8 +1456,8 @@ class Player(object):
                                         if self.run_index <= 0:
                                             self.run_index = 0
                                             self.run_index_direction = 1
-                                        if self.run_index >= self.run_indexes-1:
-                                            self.run_index = self.run_indexes-1
+                                        if self.run_index >= self.run_indexes - 1:
+                                            self.run_index = self.run_indexes - 1
                                             self.run_index_direction = -1
                                 if not self.direction == self.facing:
                                     self.facing = self.direction
@@ -1374,7 +1483,8 @@ class Player(object):
                                     self.run_start = False
                                     self.run_start_timer = 0
                         else:
-                            if not self.direction == 0 and not (self.hanging and self.attacking):
+                            if not self.direction == 0 and not (
+                                    self.hanging and self.attacking):
                                 self.climb_fire_direction = self.direction
                             else:
                                 self.climb_fire_direction = self.facing
@@ -1390,7 +1500,7 @@ class Player(object):
                                                     self.hanging = True
                                                     self.climbing = True
                                                     self.grounded = False
-                                                    self.velocity_x = tile.sprite.x-self.rect_offset_x1-self.sprite.x
+                                                    self.velocity_x = tile.sprite.x - self.rect_offset_x1 - self.sprite.x
                                                     self.attacking = False
                                                     break
                             if self.hanging:
@@ -1409,18 +1519,21 @@ class Player(object):
                                     for tile in tiles:
                                         if tile.ladder:
                                             if Rectangle(
-                                            self.sprite.x+self.rect_offset_x1,
-                                            self.sprite.y+self.rect_offset_y1,
-                                            self.sprite.x+self.rect_offset_x2,
-                                            self.sprite.y+32+3
-                                            ).intersect(tile.rect):
+                                                    self.sprite.x +
+                                                    self.rect_offset_x1,
+                                                    self.sprite.y +
+                                                    self.rect_offset_y1,
+                                                    self.sprite.x +
+                                                    self.rect_offset_x2,
+                                                    self.sprite.y + 32 +
+                                                    3).intersect(tile.rect):
                                                 if tile in self.underfoot_climb and self.grounded or not self.grounded:
                                                     if self.sliding:
                                                         self.stop_sliding()
                                                     self.hanging = True
                                                     self.climbing = True
                                                     self.grounded = False
-                                                    self.velocity_x = tile.sprite.x-self.rect_offset_x1-self.sprite.x
+                                                    self.velocity_x = tile.sprite.x - self.rect_offset_x1 - self.sprite.x
                                                     self.velocity_y = 12
                                                     self.attacking = False
                                                     break
@@ -1447,7 +1560,8 @@ class Player(object):
                             self.run_timer = 0
                             self.run_index = 0
                             self.run_index_direction = 1
-                            if not self.climbing or keys[pygame.K_UP] and keys[pygame.K_DOWN]:
+                            if not self.climbing or keys[pygame.K_UP] and keys[
+                                    pygame.K_DOWN]:
                                 self.velocity_y = 0
                             else:
                                 self.climb_timer += 1
@@ -1486,7 +1600,8 @@ class Player(object):
                                             self.run_index = 0
                                             self.run_index_direction = 1
                                 if self.hanging:
-                                    if not keys[pygame.K_UP] and not keys[pygame.K_DOWN]:
+                                    if not keys[pygame.K_UP] and not keys[
+                                            pygame.K_DOWN]:
                                         self.hanging = False
                                         self.climbing = False
                         else:
@@ -1564,13 +1679,13 @@ class Player(object):
                             index = self.index_hurt
                         elif self.running:
                             if self.attacking:
-                                index = self.index_run_attack+self.run_index
+                                index = self.index_run_attack + self.run_index
                             else:
-                                index = self.index_run+self.run_index
+                                index = self.index_run + self.run_index
                         elif self.landing:
                             index = self.index_land
                         elif self.sliding:
-                            index = self.index_slide+self.slide_anim_index
+                            index = self.index_slide + self.slide_anim_index
                         elif self.attacking:
                             index = self.index_attack
                         elif self.run_start or self.run_stop:
@@ -1605,15 +1720,19 @@ class Player(object):
                                 for tile in tiles:
                                     if tile.ladder:
                                         if Rectangle(
-                                            self.sprite.x+self.rect_offset_x1,
-                                            self.sprite.y+self.rect_offset_y1-3,
-                                            self.sprite.x+self.rect_offset_x2,
-                                            self.sprite.y+self.rect_offset_y2-14
-                                            ).intersect(tile.rect):
+                                                self.sprite.x +
+                                                self.rect_offset_x1,
+                                                self.sprite.y +
+                                                self.rect_offset_y1 - 3,
+                                                self.sprite.x +
+                                                self.rect_offset_x2,
+                                                self.sprite.y +
+                                                self.rect_offset_y2 -
+                                                14).intersect(tile.rect):
                                             valid = True
                                             break
                                 if valid:
-                                    index = self.index_climb+self.climb_index
+                                    index = self.index_climb + self.climb_index
                                 else:
                                     index = self.index_climb_end
                         else:
@@ -1624,41 +1743,44 @@ class Player(object):
                     self.sprite.flip_x = self.facing == -1
                     if self.hanging and self.attacking:
                         self.sprite.flip_x = self.climb_fire_direction == -1
-                self.sprite.subX = index*self.sprite.subWidth
+                self.sprite.subX = index * self.sprite.subWidth
+
+
 class Pickup(object):
-    def __init__(self, pos, hop=False, pickup_type='health_small'):
+    def __init__(self, pos, hop=False, pickup_type="health_small"):
         subX = 0
         subY = 0
         width = 16
         height = 16
-        if pickup_type == 'health_big':
+        if pickup_type == "health_big":
             subX = 16
             subY = 16
             width = 16
             height = 16
-        elif pickup_type == 'health_small':
+        elif pickup_type == "health_small":
             subX = 8
             subY = 32
             width = 8
             height = 8
-        elif pickup_type == 'energy_big':
+        elif pickup_type == "energy_big":
             subX = 32
             width = 16
             height = 12
-        elif pickup_type == 'energy_small':
+        elif pickup_type == "energy_small":
             subX = 8
             subY = 16
             width = 8
             height = 8
-        elif pickup_type == 'life':
+        elif pickup_type == "life":
             subX = 16
             width = 16
             height = 16
         else:
             return None
-        x = pos[0]-width/2
-        y = pos[1]-height/2
-        self.sprite = Sprite(x, y, width, height, 4, "life", subX, subY, width, height)
+        x = pos[0] - width / 2
+        y = pos[1] - height / 2
+        self.sprite = Sprite(x, y, width, height, 4, "life", subX, subY, width,
+                             height)
         self.sprite.update = self.update
         self.sprite.on_level = True
         self.timer = 0
@@ -1675,25 +1797,20 @@ class Pickup(object):
         if hop:
             self.velocity_y = -2
         else:
-            self.sprite.x += tile_size/2
-            self.sprite.y += tile_size/2
+            self.sprite.x += tile_size / 2
+            self.sprite.y += tile_size / 2
         self.gravity = 0.2
-        self.rect = Rectangle(
-            x,
-            y,
-            x+width,
-            y+height
-        )
+        self.rect = Rectangle(x, y, x + width, y + height)
+
     def destroy(self):
         game.pickups.remove(self)
         self.sprite.remove()
+
     def update_rect(self):
-        self.rect = Rectangle(
-            self.sprite.x,
-            self.sprite.y,
-            self.sprite.x+self.sprite.width,
-            self.sprite.y+self.sprite.height
-        )
+        self.rect = Rectangle(self.sprite.x, self.sprite.y,
+                              self.sprite.x + self.sprite.width,
+                              self.sprite.y + self.sprite.height)
+
     def update(self):
         if not game == None:
             if not game.paused:
@@ -1711,16 +1828,16 @@ class Pickup(object):
                                         self.sprite.y = tile.rect.bottom
                                         self.velocity_y = 0.25
                                     if self.velocity_y > 0:
-                                        self.sprite.y = tile.rect.top-self.sprite.height
+                                        self.sprite.y = tile.rect.top - self.sprite.height
                                         self.velocity_y = 0
                                 if tile.through:
                                     if self.velocity_y > 0:
-                                        self.sprite.y = tile.rect.top-self.sprite.height
+                                        self.sprite.y = tile.rect.top - self.sprite.height
                                         self.velocity_y = 0
                             self.update_rect()
                         if not self.rect.intersect(game.rect):
                             self.sprite.remove()
-                    if not self.type == 'life':
+                    if not self.type == "life":
                         self.timer += 1
                         if self.timer >= self.limit:
                             self.timer = 0
@@ -1731,25 +1848,27 @@ class Pickup(object):
                         self.sprite.visible = not self.sprite.visible
                     if self.life >= self.life_limit:
                         self.destroy()
-                    self.sprite.subY = self.subY+self.sprite.height*self.index
+                    self.sprite.subY = self.subY + self.sprite.height * self.index
                 else:
                     self.sprite.visible = False
+
+
 class Helikoppa(object):
     def __init__(self, pos):
-        x = pos[0]-6
-        y = pos[1]-12
+        x = pos[0] - 6
+        y = pos[1] - 12
         self.sprite = Sprite(x, y, 32, 24, 2, "helikoppa", 0, 0, 32, 24)
         self.sprite.update = self.update
         self.sprite.on_level = True
         self.rect_offset_x1 = 6
-        self.rect_offset_x2 = self.sprite.width-6
+        self.rect_offset_x2 = self.sprite.width - 6
         self.rect_offset_y1 = -4
         self.rect_offset_y2 = self.sprite.height
         self.rect = Rectangle(
-            self.sprite.x+self.rect_offset_x1,
-            self.sprite.y+self.rect_offset_y1,
-            self.sprite.x+self.rect_offset_x2,
-            self.sprite.y+self.rect_offset_y2,
+            self.sprite.x + self.rect_offset_x1,
+            self.sprite.y + self.rect_offset_y1,
+            self.sprite.x + self.rect_offset_x2,
+            self.sprite.y + self.rect_offset_y2,
         )
         self.center = {}
         self.facing = -1
@@ -1770,31 +1889,35 @@ class Helikoppa(object):
         self.shielded = False
         self.pos = pos
         self.turn()
+
     def update_rect(self):
         self.rect = Rectangle(
-            self.sprite.x+self.rect_offset_x1,
-            self.sprite.y+self.rect_offset_y1,
-            self.sprite.x+self.rect_offset_x2,
-            self.sprite.y+self.rect_offset_y2,
+            self.sprite.x + self.rect_offset_x1,
+            self.sprite.y + self.rect_offset_y1,
+            self.sprite.x + self.rect_offset_x2,
+            self.sprite.y + self.rect_offset_y2,
         )
-        self.center['x'] = self.rect.left + 10
-        self.center['y'] = self.rect.top + 10
+        self.center["x"] = self.rect.left + 10
+        self.center["y"] = self.rect.top + 10
         if not game == None:
             if not game.player == None:
-                self.dist_x = game.player.center['x'] - self.center['x']
-                self.dist_y = game.player.center['y'] - self.center['y']
+                self.dist_x = game.player.center["x"] - self.center["x"]
+                self.dist_y = game.player.center["y"] - self.center["y"]
+
     def kill(self, explosion=False):
         if not self.dead:
             if explosion:
-                game.pickup((self.center['x'], self.center['y']))
-                Explosion((self.center['x'], self.center['y']+10))
+                game.pickup((self.center["x"], self.center["y"]))
+                Explosion((self.center["x"], self.center["y"] + 10))
             self.dead = True
             game.enemies.remove(self)
             self.sprite.remove()
+
     def hit(self, damage, direction):
         self.health -= damage
         if self.health <= 0:
             self.kill(True)
+
     def turn(self):
         if not game == None:
             if not game.player == None:
@@ -1803,11 +1926,13 @@ class Helikoppa(object):
                 elif self.dist_x >= 0:
                     self.facing = 1
         self.sprite.flip_x = self.facing == 1
+
     def move(self, dx, dy):
         if not dx == 0:
             self.move_axis(dx, 0)
         if not dy == 0:
             self.move_axis(0, dy)
+
     def move_axis(self, dx, dy):
         self.sprite.x += dx
         self.sprite.y += dy
@@ -1816,24 +1941,25 @@ class Helikoppa(object):
             if tile.solid:
                 if self.rect.intersect(tile.rect):
                     if self.velocity_x < 0:
-                        self.sprite.x = tile.rect.right-self.rect_offset_x1
+                        self.sprite.x = tile.rect.right - self.rect_offset_x1
                     if self.velocity_x > 0:
-                        self.sprite.x = tile.rect.left-self.rect_offset_x2
+                        self.sprite.x = tile.rect.left - self.rect_offset_x2
                     if self.velocity_y < 0:
-                        self.sprite.y = tile.rect.bottom-self.rect_offset_y1
+                        self.sprite.y = tile.rect.bottom - self.rect_offset_y1
                     if self.velocity_y > 0:
-                        self.sprite.y = tile.rect.top-self.rect_offset_y2
+                        self.sprite.y = tile.rect.top - self.rect_offset_y2
                     self.update_rect()
-                    Explosion((self.center['x'], self.center['y']+10))
+                    Explosion((self.center["x"], self.center["y"] + 10))
                     self.kill()
                     break
+
     def update(self):
         if not game == None:
             if not game.paused:
                 if game.playing:
                     self.sprite.visible = True
                     if not self.falling:
-                        self.velocity_x = self.speed*self.facing
+                        self.velocity_x = self.speed * self.facing
                         self.rotor_timer += 1
                         if self.rotor_timer >= self.rotor_limit:
                             self.rotor_timer = 0
@@ -1846,28 +1972,31 @@ class Helikoppa(object):
                         self.rotor_timer = 0
                         self.index = 2
                     self.move(self.velocity_x, self.velocity_y)
-                    if self.dist_x*self.facing < self.speed and self.dist_y > 0:
+                    if self.dist_x * self.facing < self.speed and self.dist_y > 0:
                         if not self.falling:
-                            SmallExplosion((self.center['x'], self.center['y']-10))
+                            SmallExplosion(
+                                (self.center["x"], self.center["y"] - 10))
                             self.falling = True
                             sfx2.play(sfx_fall)
-                    self.sprite.subX = self.index*self.sprite.width
+                    self.sprite.subX = self.index * self.sprite.width
                     if not self.rect.intersect(game.rect_out):
                         self.kill()
                 else:
                     self.sprite.visible = False
+
+
 class Met(object):
     def __init__(self, pos):
-        x = pos[0]-4
-        y = pos[1]-8
+        x = pos[0] - 4
+        y = pos[1] - 8
         self.sprite = Sprite(x, y, 24, 24, 2, "met", 0, 0, 24, 24)
         self.sprite.update = self.update
         self.sprite.on_level = True
         self.rect = Rectangle(
-            self.sprite.x+4,
-            self.sprite.y+8,
-            self.sprite.x+self.sprite.width-4,
-            self.sprite.y+self.sprite.height,
+            self.sprite.x + 4,
+            self.sprite.y + 8,
+            self.sprite.x + self.sprite.width - 4,
+            self.sprite.y + self.sprite.height,
         )
         self.center = {}
         self.facing = -1
@@ -1888,7 +2017,7 @@ class Met(object):
         self.shot_piercing = True
         self.shots_fired = 0
         self.in_range = False
-        self.dist_max = tile_size*6
+        self.dist_max = tile_size * 6
         self.dist_x = self.dist_max
         self.dist_y = 0
         self.health = 3
@@ -1896,37 +2025,44 @@ class Met(object):
         self.dead = False
         self.invincible = False
         self.pos = pos
+
     def update_rect(self):
         self.rect = Rectangle(
-            self.sprite.x+4,
-            self.sprite.y+8,
-            self.sprite.x+self.sprite.width-4,
-            self.sprite.y+self.sprite.height,
+            self.sprite.x + 4,
+            self.sprite.y + 8,
+            self.sprite.x + self.sprite.width - 4,
+            self.sprite.y + self.sprite.height,
         )
-        self.center['x'] = self.rect.left + 8
-        self.center['y'] = self.rect.top + 8
+        self.center["x"] = self.rect.left + 8
+        self.center["y"] = self.rect.top + 8
         if not game == None:
             if not game.player == None:
-                self.dist_x = game.player.center['x'] - self.center['x']
-                self.dist_y = game.player.center['y'] - self.center['y']
+                self.dist_x = game.player.center["x"] - self.center["x"]
+                self.dist_y = game.player.center["y"] - self.center["y"]
+
     def kill(self, explosion=False):
         if not self.dead:
             if explosion:
-                game.pickup((self.center['x'], self.center['y']))
-                SmallExplosion((self.center['x'], self.center['y']))
+                game.pickup((self.center["x"], self.center["y"]))
+                SmallExplosion((self.center["x"], self.center["y"]))
             self.dead = True
             game.enemies.remove(self)
             self.sprite.remove()
+
     def hit(self, damage, direction):
         self.health -= damage
         if self.health <= 0:
             self.kill(True)
+
     def shoot(self):
-        angles = [45*self.facing, 90*self.facing, 135*self.facing]
+        angles = [45 * self.facing, 90 * self.facing, 135 * self.facing]
         for angle in angles:
-            Shot(self.center['x']+8*self.facing, self.center['y'], self, angle, self.shot_damage, self.shot_piercing, 'met', [game.player])
+            Shot(self.center["x"] + 8 * self.facing, self.center["y"], self,
+                 angle, self.shot_damage, self.shot_piercing, "met",
+                 [game.player])
         if not sfx2.get_sound() == sfx_life:
             sfx2.play(sfx_enemy_shot)
+
     def turn(self):
         if not game == None:
             if not game.player == None:
@@ -1935,6 +2071,7 @@ class Met(object):
                 elif self.dist_x >= 0:
                     self.facing = 1
         self.sprite.flip_x = self.facing == 1
+
     def update(self):
         if not game == None:
             if not game.paused:
@@ -1981,56 +2118,60 @@ class Met(object):
                                 self.hide_timer = 0
                                 self.hiding = True
                                 self.shot = False
-                    self.sprite.subX = self.hide_index*self.sprite.width
+                    self.sprite.subX = self.hide_index * self.sprite.width
                     self.shielded = self.hide_index == 0
                     if not self.rect.intersect(game.rect_out):
                         self.kill()
                 else:
                     self.sprite.visible = False
+
+
 class Shot_Zeus(object):
     def __init__(self, pos, target):
-        x = pos[0]-8
-        y = pos[1]-8
+        x = pos[0] - 8
+        y = pos[1] - 8
         self.sprite = Sprite(x, y, 16, 16, 4, "zeus", 0, 48, 16, 16)
         self.sprite.update = self.update
         self.sprite.on_level = True
         self.rect = Rectangle(
             self.sprite.x,
             self.sprite.y,
-            self.sprite.x+self.sprite.width,
-            self.sprite.y+self.sprite.height,
+            self.sprite.x + self.sprite.width,
+            self.sprite.y + self.sprite.height,
         )
         self.center = {}
         self.target = target
         self.update_rect()
-        self.target_x = self.target.center['x']
-        self.target_y = self.target.center['y']
-        self.dist_x = self.target_x - self.center['x']
-        self.dist_y = self.target_y - self.center['y']
+        self.target_x = self.target.center["x"]
+        self.target_y = self.target.center["y"]
+        self.dist_x = self.target_x - self.center["x"]
+        self.dist_y = self.target_y - self.center["y"]
         self.radians = math.atan2(self.dist_y, self.dist_x)
-        self.angle = self.radians*180/math.pi
+        self.angle = self.radians * 180 / math.pi
         self.speed = 3.5
         self.index = 0
         self.timer = 0
         self.limit = 5
         self.direction = 1
-        self.velocity_x = math.cos(self.radians)*self.speed
-        self.velocity_y = math.sin(self.radians)*self.speed
+        self.velocity_x = math.cos(self.radians) * self.speed
+        self.velocity_y = math.sin(self.radians) * self.speed
         self.repel = False
         self.stopped = False
         self.stop_timer = 0
         self.stop_limit = 60
         self.damage = 4
         sfx4.play(sfx_lightning_ball)
+
     def update_rect(self):
         self.rect = Rectangle(
             self.sprite.x,
             self.sprite.y,
-            self.sprite.x+self.sprite.width,
-            self.sprite.y+self.sprite.height,
+            self.sprite.x + self.sprite.width,
+            self.sprite.y + self.sprite.height,
         )
-        self.center['x'] = self.sprite.x+self.sprite.width/2
-        self.center['y'] = self.sprite.y+self.sprite.height/2
+        self.center["x"] = self.sprite.x + self.sprite.width / 2
+        self.center["y"] = self.sprite.y + self.sprite.height / 2
+
     def update(self):
         if not game == None:
             if not game.paused:
@@ -2050,9 +2191,10 @@ class Shot_Zeus(object):
                     else:
                         self.direction = 1
                     self.update_rect()
-                    self.dist_x = self.target_x - self.center['x']
-                    self.dist_y = self.target_y - self.center['y']
-                    self.dist = math.sqrt(self.dist_x*self.dist_x+self.dist_y*self.dist_y)
+                    self.dist_x = self.target_x - self.center["x"]
+                    self.dist_y = self.target_y - self.center["y"]
+                    self.dist = math.sqrt(self.dist_x * self.dist_x +
+                                          self.dist_y * self.dist_y)
         ##            if not self.repel:
         ##                if self.dist < self.speed:
         ##                    self.stopped = True
@@ -2063,23 +2205,25 @@ class Shot_Zeus(object):
                         self.stopped = False
                         self.repel = True
                         self.update_rect()
-                        self.target_x = self.target.center['x']
-                        self.target_y = self.target.center['y']
-                        self.dist_x = self.target_x - self.center['x']
-                        self.dist_y = self.target_y - self.center['y']
+                        self.target_x = self.target.center["x"]
+                        self.target_y = self.target.center["y"]
+                        self.dist_x = self.target_x - self.center["x"]
+                        self.dist_y = self.target_y - self.center["y"]
                         self.radians = math.atan2(self.dist_y, self.dist_x)
-                        self.velocity_x = math.cos(self.radians)*self.speed
-                        self.velocity_y = math.sin(self.radians)*self.speed
+                        self.velocity_x = math.cos(self.radians) * self.speed
+                        self.velocity_y = math.sin(self.radians) * self.speed
 
-                self.sprite.subX = self.index*self.sprite.subWidth
+                self.sprite.subX = self.index * self.sprite.subWidth
                 if self.rect.intersect(game.player.rect):
                     game.player.hit(self.damage, self.direction)
                 if not self.rect.intersect(screen_rect):
                     self.sprite.remove()
+
+
 class Boss_Zeus(object):
     def __init__(self, pos):
-        x = pos[0]*tile_size-16
-        y = pos[1]*tile_size-36
+        x = pos[0] * tile_size - 16
+        y = pos[1] * tile_size - 36
         self.sprite = Sprite(x, y, 48, 48, 2, "zeus", 0, 0, 48, 48)
         self.sprite.update = self.update
         self.sprite.on_level = True
@@ -2089,14 +2233,12 @@ class Boss_Zeus(object):
         self.rect_offset_y1 = 15
         self.rect_offset_x2 = 32
         self.rect_offset_y2 = 44
-        self.rect = Rectangle(
-            self.sprite.x+self.rect_offset_x1,
-            self.sprite.y+self.rect_offset_y1,
-            self.sprite.x+self.rect_offset_x2,
-            self.sprite.y+self.rect_offset_y2
-        )
-        self.sprite.width = self.rect_offset_x2-self.rect_offset_x1
-        self.sprite.height = self.rect_offset_y2-self.rect_offset_y1
+        self.rect = Rectangle(self.sprite.x + self.rect_offset_x1,
+                              self.sprite.y + self.rect_offset_y1,
+                              self.sprite.x + self.rect_offset_x2,
+                              self.sprite.y + self.rect_offset_y2)
+        self.sprite.width = self.rect_offset_x2 - self.rect_offset_x1
+        self.sprite.height = self.rect_offset_y2 - self.rect_offset_y1
         self.run_timer = 0
         self.run_limit = 6
         self.run_index = 0
@@ -2118,12 +2260,9 @@ class Boss_Zeus(object):
         self.velocity_y = 0
         self.underfoot = []
         self.grounded = True
-        self.state = 'idle'
+        self.state = "idle"
         self.state_timer = 0
-        self.timers = {
-            'land':5,
-            'shoot':6
-        }
+        self.timers = {"land": 5, "shoot": 6}
         self.shoot_index = 0
         self.shots = 0
         self.jump_timer = 0
@@ -2152,24 +2291,20 @@ class Boss_Zeus(object):
         self.dumb_fall = False
         self.dash_fall = False
         self.last_dash = False
-        self.sprite.subX = self.index_run*self.sprite.subWidth
+        self.sprite.subX = self.index_run * self.sprite.subWidth
         self.center = {}
         self.update_rect()
+
     def update_rect(self):
-        self.rect = Rectangle(
-            self.sprite.x+self.rect_offset_x1,
-            self.sprite.y+self.rect_offset_y1,
-            self.sprite.x+self.rect_offset_x2,
-            self.sprite.y+self.rect_offset_y2
-        )
-        self.rect_dash = Rectangle(
-            self.sprite.x+11,
-            self.sprite.y+21,
-            self.sprite.x+30,
-            self.sprite.y+32
-        )
-        self.center['x'] = self.rect.left+self.sprite.width/2
-        self.center['y'] = self.rect.top +self.sprite.height/2
+        self.rect = Rectangle(self.sprite.x + self.rect_offset_x1,
+                              self.sprite.y + self.rect_offset_y1,
+                              self.sprite.x + self.rect_offset_x2,
+                              self.sprite.y + self.rect_offset_y2)
+        self.rect_dash = Rectangle(self.sprite.x + 11, self.sprite.y + 21,
+                                   self.sprite.x + 30, self.sprite.y + 32)
+        self.center["x"] = self.rect.left + self.sprite.width / 2
+        self.center["y"] = self.rect.top + self.sprite.height / 2
+
     def move_axis(self, dx, dy):
         self.sprite.x += dx
         self.sprite.y += dy
@@ -2178,19 +2313,20 @@ class Boss_Zeus(object):
             if tile.solid:
                 if self.rect.intersect(tile.rect):
                     if dx < 0:
-                        self.sprite.x = tile.sprite.x+tile.sprite.width-self.rect_offset_x1
+                        self.sprite.x = tile.sprite.x + tile.sprite.width - self.rect_offset_x1
                         self.update_rect()
                     if dx > 0:
-                        self.sprite.x = tile.sprite.x-self.rect_offset_x2
+                        self.sprite.x = tile.sprite.x - self.rect_offset_x2
                         self.update_rect()
                     if dy < 0:
-                        self.sprite.y = tile.sprite.y+tile.sprite.height-self.rect_offset_y1
+                        self.sprite.y = tile.sprite.y + tile.sprite.height - self.rect_offset_y1
                         self.velocity_y = 0.25
                     if dy > 0:
-                        self.sprite.y = tile.sprite.y-self.rect_offset_y2
+                        self.sprite.y = tile.sprite.y - self.rect_offset_y2
                         self.velocity_y = 0
                         self.underfoot.append(tile)
                     self.update_rect()
+
     def move(self, dx, dy):
         self.underfoot = []
         if not dx == 0:
@@ -2198,76 +2334,86 @@ class Boss_Zeus(object):
         if not dy == 0:
             self.move_axis(0, dy)
         rect = self.rect
-        if self.state == 'dash':
+        if self.state == "dash":
             rect = self.rect_dash
         if rect.intersect(game.player.rect):
             game.player.hit(4, self.facing)
         if len(self.underfoot) > 0:
             if not self.grounded:
-                self.state = 'land'
+                self.state = "land"
                 self.state_timer = 0
             self.grounded = True
         else:
             self.grounded = False
+
     def hit(self, damage):
         self.health -= damage
         self.health_bar.update_ticks(self.health)
         self.sprite.visible = False
-    def jump(self, direction='forward'):
+
+    def jump(self, direction="forward"):
         self.stop_run()
-        self.state = 'jump_'+direction
+        self.state = "jump_" + direction
         self.velocity_y = -self.jump_height
-        if direction == 'back':
+        if direction == "back":
             self.velocity_y = -self.jump_back_height
-        if direction == 'bolt':
+        if direction == "bolt":
             self.velocity_y = -self.jump_bolt_height
-        if direction == 'shoot':
+        if direction == "shoot":
             self.velocity_y = -self.jump_shoot_height
+
     def shoot(self):
-        Shot_Zeus((self.center['x']+8*self.direction, self.center['y']), game.player)
+        Shot_Zeus((self.center["x"] + 8 * self.direction, self.center["y"]),
+                  game.player)
         self.stop_run()
         self.turn()
-        self.change_state('shoot')
+        self.change_state("shoot")
         self.shots += 1
+
     def run(self):
         self.shots = 0
         self.running = True
-        self.target_x = game.player.center['x']
+        self.target_x = game.player.center["x"]
         self.run_timer = 0
         self.run_index = 0
         self.run_index_direction = 0
-        self.change_state('run')
+        self.change_state("run")
         self.turn()
+
     def stop_run(self):
         self.running = False
         self.run_timer = 0
         self.run_index = 0
         self.run_index_direction = 0
-        self.change_state('idle')
+        self.change_state("idle")
+
     def dash(self):
         self.stop_run()
         self.dash_timer = 0
-        self.change_state('dash')
+        self.change_state("dash")
+
     def change_state(self, new_state):
         self.state_last = self.state
         self.state = new_state
+
     def turn(self):
-        if self.center['x'] < game.player.center['x']:
+        if self.center["x"] < game.player.center["x"]:
             self.direction = 1
-        if self.center['x'] > game.player.center['x']:
+        if self.center["x"] > game.player.center["x"]:
             self.direction = -1
+
     def update(self):
         if not game == None:
             if not game.paused:
                 if self.health <= 0 and not self.dead:
                     self.dead = True
-                    OrbExplosion((self.center['x'], self.center['y']))
+                    OrbExplosion((self.center["x"], self.center["y"]))
                     self.sprite.remove()
                     game.enemies.remove(self)
                 self.sprite.visible = True
                 index = 0
                 if self.running:
-                    if abs(self.target_x-self.center['x']) > tile_size*3:
+                    if abs(self.target_x - self.center["x"]) > tile_size * 3:
                         self.velocity_x = self.run_speed * self.direction
                         self.run_timer += 1
                         if self.run_timer >= self.run_limit:
@@ -2276,10 +2422,10 @@ class Boss_Zeus(object):
                             if self.run_index <= 0:
                                 self.run_index = 0
                                 self.run_index_direction = 1
-                            if self.run_index >= self.run_indexes-1:
-                                self.run_index = self.run_indexes-1
+                            if self.run_index >= self.run_indexes - 1:
+                                self.run_index = self.run_indexes - 1
                                 self.run_index_direction = -1
-                        index = self.index_run+self.run_index
+                        index = self.index_run + self.run_index
                         if game.player.attacked:
                             self.turn()
                             if game.player.grounded:
@@ -2288,16 +2434,16 @@ class Boss_Zeus(object):
                                 self.jump()
                     else:
                         self.turn()
-                        self.jump('dash')
-                if self.state == 'idle':
+                        self.jump("dash")
+                if self.state == "idle":
                     self.velocity_x = 0
                     index = self.index_idle
                     if not game.player.warping:
                         self.run()
-                if self.state == 'shoot':
+                if self.state == "shoot":
                     self.velocity_x = 0
                     self.velocity_y = 0
-                    index = self.index_shoot_air+self.shoot_index
+                    index = self.index_shoot_air + self.shoot_index
                     self.state_timer += 1
                     if self.reloading:
                         self.reload_timer += 1
@@ -2308,7 +2454,7 @@ class Boss_Zeus(object):
                             self.reloading = False
                             self.shots = 0
                     if not self.reloading or self.shoot_index > 0:
-                        if self.state_timer >= self.timers['shoot']:
+                        if self.state_timer >= self.timers["shoot"]:
                             self.state_timer = 0
                             self.shoot_index += 1
                             if self.shoot_index > 2:
@@ -2324,42 +2470,42 @@ class Boss_Zeus(object):
                                         self.shot_index = 0
                                     else:
                                         self.rounds = 0
-                                        self.state = 'dumb_fall'
+                                        self.state = "dumb_fall"
                                         self.shots = 0
                                         self.shot_index = 0
-                if self.state == 'land':
+                if self.state == "land":
                     self.velocity_x = 0
                     index = self.index_land
                     self.state_timer += 1
-                    if self.state_timer >= self.timers['land']:
+                    if self.state_timer >= self.timers["land"]:
                         self.state_timer = 0
                         if self.dash_fall:
                             self.turn()
-                            self.jump('shoot')
+                            self.jump("shoot")
                         elif self.jumping_forward:
                             self.turn()
-                            self.jump('back')
+                            self.jump("back")
                         elif self.last_dash:
                             self.last_dash = False
-                            self.jump('shoot')
+                            self.jump("shoot")
                         else:
                             self.run()
                         self.dash_fall = False
                         self.dumb_fall = False
-                if self.state == 'jump_forward':
+                if self.state == "jump_forward":
                     index = self.index_jump_forward
                     self.velocity_x = self.run_speed * self.direction
                     self.jumping_forward = True
-                if self.state == 'jump_dash':
+                if self.state == "jump_dash":
                     index = self.index_jump_back
-                    self.velocity_x = self.run_speed/2 * -self.direction
+                    self.velocity_x = self.run_speed / 2 * -self.direction
                     self.jump_timer += 1
                     if self.jump_timer >= 43:
                         self.jump_timer = 0
                         self.turn()
                         self.dash()
                     self.jumping_forward = False
-                if self.state == 'jump_shoot':
+                if self.state == "jump_shoot":
                     index = self.index_jump_back
                     self.jump_timer += 1
                     if self.jump_timer >= self.jump_shoot_limit:
@@ -2367,96 +2513,168 @@ class Boss_Zeus(object):
                         self.shoot()
                         self.turn()
                     self.jumping_forward = False
-                if self.state == 'jump_back':
+                if self.state == "jump_back":
                     index = self.index_jump_back
                     self.velocity_x = self.run_speed * -self.direction
-        ##            self.jump_timer += 1
-        ##            if self.jump_timer >= self.jump_limit:
-        ##                self.jump_timer = 0
-        ##                self.state = 'dash'
-        ##                self.turn()
+                    ##            self.jump_timer += 1
+                    ##            if self.jump_timer >= self.jump_limit:
+                    ##                self.jump_timer = 0
+                    ##                self.state = "dash"
+                    ##                self.turn()
                     self.jumping_forward = False
-                if self.state == 'jump_bolt':
+                if self.state == "jump_bolt":
                     self.velocity_x = 0
                     index = self.index_bolt_jump
                     if self.sprite.y < 16:
                         self.sprite.y = 16
                         self.velocity_y = 0
-                        self.state = 'bolt_charge'
-                if self.state == 'bolt_charge':
-                    index = self.index_bolt_charge+self.bolt_index
+                        self.state = "bolt_charge"
+                if self.state == "bolt_charge":
+                    index = self.index_bolt_charge + self.bolt_index
                     self.bolt_timer += 1
                     if self.bolt_timer >= self.bolt_limit:
                         self.bolt_timer = 0
                         self.bolt_index += 1
                         if self.bolt_index > 1:
                             self.bolt_index = 0
-                            self.state = 'bolt'
-                if self.state == 'bolt':
+                            self.state = "bolt"
+                if self.state == "bolt":
                     if self.bolt_index > 1:
-                        index = self.index_bolt+1
+                        index = self.index_bolt + 1
                     else:
-                        index = self.index_bolt+self.bolt_index
+                        index = self.index_bolt + self.bolt_index
                     self.bolt_timer += 1
                     if self.bolt_timer >= self.bolt_limit:
                         self.bolt_timer = 0
                         self.bolt_index += 1
                         if self.bolt_index > 4:
                             self.bolt_index = 0
-                            self.state = 'dumb_fall'
-                if self.state == 'dash_fall':
+                            self.state = "dumb_fall"
+                if self.state == "dash_fall":
                     index = self.index_jump_back
                     self.velocity_x = self.run_speed * self.direction
                     self.jumping_forward = False
                     self.dash_fall = True
-                if self.state == 'dumb_fall':
+                if self.state == "dumb_fall":
                     index = self.index_jump_back
                     self.velocity_x = 0
                     self.jumping_forward = False
                     self.dumb_fall = True
-                if self.state == 'dash':
+                if self.state == "dash":
                     index = self.index_dash
                     self.velocity_x = self.dash_speed * self.direction
                     self.dash_timer += 1
                     if self.dash_timer >= self.dash_limit:
                         self.dash_timer = 0
-                        self.state = 'dash_fall'
+                        self.state = "dash_fall"
                     self.jumping_forward = False
-                if self.state == 'dash' or self.state == 'shoot' or self.state == 'bolt' or self.state == 'bolt_charge':
+                if self.state == "dash" or self.state == "shoot" or self.state == "bolt" or self.state == "bolt_charge":
                     self.velocity_y = 0
                 else:
                     self.velocity_y += self.gravity
                 self.move(self.velocity_x, self.velocity_y)
-                if self.state == 'idle':
+                if self.state == "idle":
                     self.turn()
-                if self.center['x'] < 0 or self.center['x'] > screen_size[0]:
-                    if not self.state == 'dash':
+                if self.center["x"] < 0 or self.center["x"] > screen_size[0]:
+                    if not self.state == "dash":
                         self.dash()
                     else:
-                        self.state = 'dumb_fall'
+                        self.state = "dumb_fall"
                     self.turn()
                 self.facing = self.direction
                 self.sprite.flip_x = self.facing == 1
-                self.sprite.subX = index*self.sprite.subWidth
+                self.sprite.subX = index * self.sprite.subWidth
+
+
 class Game(object):
     def __init__(self):
         self.enemies = []
         self.pickups = []
         self.parser = {
-            'm':{'index':0, 'solid':False, 'through':False, 'ladder':False},
-            'h':{'index':0, 'solid':False, 'through':False, 'ladder':False},
-            'V':{'index':0, 'solid':False, 'through':False, 'ladder':False},
-            ' ':{'index':0, 'solid':False, 'through':False, 'ladder':False},
-            '.':{'index':1, 'solid':False, 'through':False, 'ladder':False},
-            ',':{'index':2, 'solid':False, 'through':False, 'ladder':False},
-            '\'':{'index':3, 'solid':False, 'through':False, 'ladder':False},
-            'F':{'index':4, 'solid':False, 'through':False, 'ladder':False},
-            'E':{'index':5, 'solid':False, 'through':False, 'ladder':False},
-            '#':{'index':6, 'solid':True, 'through':False, 'ladder':False},
-            'H':{'index':7, 'solid':True, 'through':False, 'ladder':False},
-            '=':{'index':8, 'solid':True, 'through':False, 'ladder':False},
-            '|':{'index':9, 'solid':False, 'through':False, 'ladder':True},
-            'T':{'index':9, 'solid':False, 'through':True, 'ladder':True},
+            "m": {
+                "index": 0,
+                "solid": False,
+                "through": False,
+                "ladder": False
+            },
+            "h": {
+                "index": 0,
+                "solid": False,
+                "through": False,
+                "ladder": False
+            },
+            "V": {
+                "index": 0,
+                "solid": False,
+                "through": False,
+                "ladder": False
+            },
+            " ": {
+                "index": 0,
+                "solid": False,
+                "through": False,
+                "ladder": False
+            },
+            ".": {
+                "index": 1,
+                "solid": False,
+                "through": False,
+                "ladder": False
+            },
+            ",": {
+                "index": 2,
+                "solid": False,
+                "through": False,
+                "ladder": False
+            },
+            "\\": {
+                "index": 3,
+                "solid": False,
+                "through": False,
+                "ladder": False
+            },
+            "F": {
+                "index": 4,
+                "solid": False,
+                "through": False,
+                "ladder": False
+            },
+            "E": {
+                "index": 5,
+                "solid": False,
+                "through": False,
+                "ladder": False
+            },
+            "#": {
+                "index": 6,
+                "solid": True,
+                "through": False,
+                "ladder": False
+            },
+            "H": {
+                "index": 7,
+                "solid": True,
+                "through": False,
+                "ladder": False
+            },
+            "=": {
+                "index": 8,
+                "solid": True,
+                "through": False,
+                "ladder": False
+            },
+            "|": {
+                "index": 9,
+                "solid": False,
+                "through": False,
+                "ladder": True
+            },
+            "T": {
+                "index": 9,
+                "solid": False,
+                "through": True,
+                "ladder": True
+            },
         }
         self.rooms = []
         self.map = [
@@ -2477,7 +2695,9 @@ class Game(object):
             "HHH############HHHH#########..'.HHH#..#########HHH",
         ]
         self.parse(self.map)
-        self.bounds = Rectangle(0, 0, len(self.map[0])*tile_size, len(self.map)*tile_size)
+        self.bounds = Rectangle(0, 0,
+                                len(self.map[0]) * tile_size,
+                                len(self.map) * tile_size)
         self.rect = screen_rect
         self.rect_out = screen_rect
         fade(True, 2)
@@ -2485,7 +2705,8 @@ class Game(object):
         square2.stop()
         triangle.stop()
         noise.stop()
-        self.level_surface = pygame.Surface((self.bounds.right, self.bounds.bottom))
+        self.level_surface = pygame.Surface(
+            (self.bounds.right, self.bounds.bottom))
         self.level_x = 0
         self.player = None
         self.blinks = 0
@@ -2503,7 +2724,8 @@ class Game(object):
         self.death_timer = 0
         self.death_limit = 150
         self.playing = False
-        self.ready = ScreenText(108, 108, 'READY', True)
+        self.ready = ScreenText(108, 108, "READY", True)
+
     def parse(self, stage):
         global tiles
         for enemy in self.enemies:
@@ -2519,28 +2741,33 @@ class Game(object):
         for row in stage:
             x = 0
             for t in row:
-                if x < screen_size[0]/tile_size+1:
-                    tx = x*tile_size
-                    ty = y*tile_size-8
-                    if t == 'm':
+                if x < screen_size[0] / tile_size + 1:
+                    tx = x * tile_size
+                    ty = y * tile_size - 8
+                    if t == "m":
                         self.enemies.append(Met((tx, ty)))
-                    if t == 'h':
+                    if t == "h":
                         self.enemies.append(Helikoppa((tx, ty)))
-                    if t == 'V':
-                        self.pickups.append(Pickup((tx, ty), False, 'life'))
-                    Tile(tx, ty, self.parser[t]['index'], 0, self.parser[t]['solid'], self.parser[t]['through'], self.parser[t]['ladder'])
+                    if t == "V":
+                        self.pickups.append(Pickup((tx, ty), False, "life"))
+                    Tile(tx, ty, self.parser[t]["index"], 0,
+                         self.parser[t]["solid"], self.parser[t]["through"],
+                         self.parser[t]["ladder"])
                 else:
                     break
                 x += 1
             y += 1
+
     def pause(self):
-        self.menu = Sprite(0, 0, screen_size[0], screen_size[1], 8, 'menu')
+        self.menu = Sprite(0, 0, screen_size[0], screen_size[1], 8, "menu")
         self.paused = True
         fade(True, self.pause_fade_speed)
+
     def unpause(self):
         self.menu.remove()
         self.paused = False
         fade(True, self.pause_fade_speed)
+
     def reset(self):
         self.level_x = 0
         square1.play(proto)
@@ -2560,34 +2787,30 @@ class Game(object):
         self.refill_timer = 0
         self.refilling = False
         self.refill_recipient = None
+
     def pickup(self, pos):
-        pickup_type = 'none'
+        pickup_type = "none"
         n = random.randint(1, 128)
         if n <= 1:
-            pickup_type = 'life'
+            pickup_type = "life"
         elif n <= 6:
-            pickup_type = 'energy_big'
+            pickup_type = "energy_big"
         elif n <= 10:
-            pickup_type = 'health_big'
+            pickup_type = "health_big"
         elif n <= 35:
-            pickup_type = 'energy_small'
+            pickup_type = "energy_small"
         elif n <= 50:
-            pickup_type = 'health_small'
-        if not pickup_type == 'none':
+            pickup_type = "health_small"
+        if not pickup_type == "none":
             self.pickups.append(Pickup(pos, True, pickup_type))
+
     def update_rect(self):
-        self.rect = Rectangle(
-            -self.level_x,
-            0,
-            -self.level_x+screen_size[0],
-            screen_size[1]
-        )
-        self.rect_out = Rectangle(
-            -self.level_x,
-            0,
-            -self.level_x+screen_size[0],
-            screen_size[1]
-        )
+        self.rect = Rectangle(-self.level_x, 0, -self.level_x + screen_size[0],
+                              screen_size[1])
+        self.rect_out = Rectangle(-self.level_x, 0,
+                                  -self.level_x + screen_size[0],
+                                  screen_size[1])
+
     def update(self):
         self.level_surface.fill(screen_color)
         if self.blinking:
@@ -2603,7 +2826,7 @@ class Game(object):
                         self.ready.remove()
                         self.player = Player((2, 11))
                         self.playing = True
-                       # self.enemies.append(Boss_Zeus((13, 11)))
+                    # self.enemies.append(Boss_Zeus((13, 11)))
         else:
             if not self.player == None:
                 if not self.player.warping:
@@ -2624,10 +2847,11 @@ class Game(object):
                         self.player.life_text.remove()
                         self.player.sprite.remove()
                         self.player = None
-                        self.ready = ScreenText(108, 108, 'READY', True)
+                        self.ready = ScreenText(108, 108, "READY", True)
                         fade(False, 2)
 
-selectBG = Sprite(0, 0, 256, 224,  0, "background", 0, 0, 256, 224)
+
+selectBG = Sprite(0, 0, 256, 224, 0, "background", 0, 0, 256, 224)
 
 for i in range(7):
     Portrait(i, False)
@@ -2639,6 +2863,7 @@ text_nessus = ScreenText(24, 128, "NESSUS", True)
 text_cronus = ScreenText(184, 128, "CRONUS", True)
 text = [text_press_start, text_zeus, text_heracles, text_nessus, text_cronus]
 
+
 def pxarray_colors(pxarray):
     colors = []
     shape = pxarray.shape
@@ -2648,79 +2873,50 @@ def pxarray_colors(pxarray):
             if not col in colors:
                 colors.append(col)
     return colors
+
+
 def scale(new_scale):
     global screen_scale, screen_size_scaled, screen
     screen_scale = new_scale
-    screen_size_scaled = (screen_size[0]*screen_scale, screen_size[1]*screen_scale)
+    screen_size_scaled = (screen_size[0] * screen_scale,
+                          screen_size[1] * screen_scale)
     screen = pygame.display.set_mode(screen_size_scaled)
 
+
 fade_color_table = [
-[],
-[(56,135,0),
- (12,72,0),
- (0,0,0), 
- (0,0,0),
- (86,29,0),
- (153,78,0),
- (234,158,34),
- (0,0,0),
- (0,0,0),
- (20,18,167),
- (0,0,0),
- (0,0,0),
- (86,29,0),
- (0,0,0),
- (0,0,0),
- (0,0,0,0),
- (0,0,0),
- (110,0,64),
- (59,0,164),
- (0,42,136),
- (173,173,173),
- (102,102,102),
- (0,0,0),
- (21,95,217), (66, 64, 255), (108,7,0), (153,78,0), (181,49,32), (234,158,34), (0,82,0)],
-[(12,72,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (86,29,0), (153,78,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (102,102,102), (0,0,0), (0,0,0), (0,42,136), (0,42,136), (0,0,0), (86,29,0), (108,7,0), (153,78,0), (0,0,0)],
-[(0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (86,29,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (0,0,0), (86,29,0), (0,0,0)],
+    [],
+    [(56, 135, 0), (12, 72, 0), (0, 0, 0), (0, 0, 0), (86, 29, 0),
+     (153, 78, 0), (234, 158, 34), (0, 0, 0), (0, 0, 0), (20, 18, 167),
+     (0, 0, 0), (0, 0, 0), (86, 29, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0, 0),
+     (0, 0, 0), (110, 0, 64), (59, 0, 164), (0, 42, 136), (173, 173, 173),
+     (102, 102, 102), (0, 0, 0), (21, 95, 217), (66, 64, 255), (108, 7, 0),
+     (153, 78, 0), (181, 49, 32), (234, 158, 34), (0, 82, 0)],
+    [(12, 72, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (86, 29, 0),
+     (153, 78, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0),
+     (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0, 0), (0, 0, 0), (0, 0, 0),
+     (0, 0, 0), (0, 0, 0), (102, 102, 102), (0, 0, 0), (0, 0, 0), (0, 42, 136),
+     (0, 42, 136), (0, 0, 0), (86, 29, 0), (108, 7, 0), (153, 78, 0),
+     (0, 0, 0)],
+    [(0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0),
+     (86, 29, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0),
+     (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0, 0), (0, 0, 0), (0, 0, 0),
+     (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0),
+     (0, 0, 0), (0, 0, 0), (0, 0, 0), (0, 0, 0), (86, 29, 0), (0, 0, 0)],
 ]
-color_table = [
-    (136,216,0),
-    (56,135,0),
-    (12,72,0),
-    (86,29,0),
-    (153,78,0),
-    (234,158,34),
-    (228,229,148),
-    (108,7,0),
-    (20,18,167),
-    (66,64,255),
-    (59,0,164),
-    (86,29,0),
-    (153,78,0),
-    (0,42,136),
-    (102,102,102),
-    (255,0,255,255),
-    (110,0,64),
-    (183,30,123),
-    (117,39,254),
-    (21,95,217),
-    (255,255,255),
-    (173,173,173),
-    (0,0,0),
-    (100,176,255),
-    (146,144,255),
-    (181,49,32),
-    (234,158,34),
-    (255,129,112),
-    (247,216,165),
-    (13,147,0)
-]
+color_table = [(136, 216, 0), (56, 135, 0), (12, 72, 0), (86, 29, 0),
+               (153, 78, 0), (234, 158, 34), (228, 229, 148), (108, 7, 0),
+               (20, 18, 167), (66, 64, 255), (59, 0, 164), (86, 29, 0),
+               (153, 78, 0), (0, 42, 136), (102, 102, 102), (255, 0, 255, 255),
+               (110, 0, 64), (183, 30, 123), (117, 39, 254), (21, 95, 217),
+               (255, 255, 255), (173, 173, 173), (0, 0, 0), (100, 176, 255),
+               (146, 144, 255), (181, 49, 32), (234, 158, 34), (255, 129, 112),
+               (247, 216, 165), (13, 147, 0)]
 
 fading = False
 fade_timer = 0
 fade_limit = 2
 fade_index = 0
-fade_type = 'out'
+fade_type = "out"
 
 flashing = False
 flash_timer = 0
@@ -2728,12 +2924,16 @@ flash_limit = 5
 flashes = 0
 flashes_limit = 4
 flash_index = 0
+
+
 def flash():
     global flashing, flash_timer, flashes, flash_index
     flashing = True
     flash_timer = 0
     flashes = 0
     flash_index = 1
+
+
 def fade(type=False, limit=1):
     global fading, fade_type, fade_timer, fade_limit, fade_index
     fading = True
@@ -2741,10 +2941,11 @@ def fade(type=False, limit=1):
     fade_limit = limit
     if type == True:
         fade_index = 4
-        fade_type = 'in'
+        fade_type = "in"
     else:
         fade_index = 0
-        fade_type = 'out'
+        fade_type = "out"
+
 
 def redraw():
     global sprites
@@ -2752,8 +2953,8 @@ def redraw():
     screen.fill(screen_color)
     screen_surface.fill(screen_color)
     for rectangle in rectangles:
-        pygame.draw.rect(screen_surface, (110,0,64), rectangle)
-    spritesByDepths = [];
+        pygame.draw.rect(screen_surface, (110, 0, 64), rectangle)
+    spritesByDepths = []
     for sprite in sprites:
         d = sprite.depth
         if d >= len(spritesByDepths):
@@ -2764,28 +2965,41 @@ def redraw():
         spritesByDepths[d].append(sprite)
     sprites = []
     for i in range(len(spritesByDepths)):
-            for j in range(len(spritesByDepths[i])):
-                    sprites.append(spritesByDepths[i][j])
+        for j in range(len(spritesByDepths[i])):
+            sprites.append(spritesByDepths[i][j])
     for sprite in sprites:
         if sprite.visible:
-            if sprite.type == 'surface':
-                sprite.surface = sprites_path[sprite.path].convert().subsurface(sprite.subX, sprite.subY, sprite.subWidth, sprite.subHeight)
-                sprite.surface = pygame.transform.flip(sprite.surface, sprite.flip_x, sprite.flip_y)
+            if sprite.type == "surface":
+                sprite.surface = sprites_path[
+                    sprite.path].convert().subsurface(sprite.subX, sprite.subY,
+                                                      sprite.subWidth,
+                                                      sprite.subHeight)
+                sprite.surface = pygame.transform.flip(sprite.surface,
+                                                       sprite.flip_x,
+                                                       sprite.flip_y)
                 if sprite.fade_index > 0:
                     sprite_pxarray = pygame.PixelArray(sprite.surface)
                     if sprite.fade_index < 4 and sprite.fade_index > 0:
                         for color in pxarray_colors(sprite_pxarray):
-                            if not (color.r == 255 and color.g == 0 and color.b == 255):
+                            if not (color.r == 255 and color.g == 0
+                                    and color.b == 255):
                                 try:
-                                    sprite_pxarray.replace(color, fade_color_table[sprite.fade_index][color_table.index(color)])
+                                    sprite_pxarray.replace(
+                                        color,
+                                        fade_color_table[sprite.fade_index][
+                                            color_table.index(color)])
                                 except ValueError:
-                                    print("ValueError encountered. Color at fault is "+str(color))
+                                    print(
+                                        "ValueError encountered. Color at fault is "
+                                        + str(color))
                                     sprite_pxarray.replace(color, (0, 0, 0))
                             else:
-                                sprite_pxarray.replace(color, pygame.Color(255, 0, 255, 0))
+                                sprite_pxarray.replace(
+                                    color, pygame.Color(255, 0, 255, 0))
                     if sprite.fade_index == 4:
                         for color in pxarray_colors(sprite_pxarray):
-                            if not (color.r == 255 and color.g == 0 and color.b == 255):
+                            if not (color.r == 255 and color.g == 0
+                                    and color.b == 255):
                                 sprite_pxarray.replace(color, (0, 0, 0))
                     sprite_surface = sprite_pxarray.make_surface().convert()
                 else:
@@ -2793,18 +3007,22 @@ def redraw():
                 sprite_surface.set_colorkey(colorkey)
                 if not game == None and sprite.on_level:
                     if not game.paused:
-                        game.level_surface.blit(sprite_surface, (sprite.x, sprite.y))
+                        game.level_surface.blit(sprite_surface,
+                                                (sprite.x, sprite.y))
                 else:
                     screen_surface.blit(sprite_surface, (sprite.x, sprite.y))
-            elif sprite.type == 'rectangle':
+            elif sprite.type == "rectangle":
                 sprite_color = sprite.color
                 if sprite.fade_index > 0:
                     sprite_pxarray = pygame.PixelArray(sprite.surface)
                     if sprite.fade_index < 4 and sprite.fade_index > 0:
                         try:
-                            sprite_color = fade_color_table[sprite.fade_index][color_table.index(color)]
+                            sprite_color = fade_color_table[sprite.fade_index][
+                                color_table.index(color)]
                         except ValueError:
-                            print("ValueError encountered. Color at fault is "+str(color))
+                            print(
+                                "ValueError encountered. Color at fault is " +
+                                str(color))
                             sprite_color = (0, 0, 0)
                     if sprite.fade_index == 4:
                         sprite_color = (0, 0, 0)
@@ -2818,15 +3036,21 @@ def redraw():
     if fade_index < 4 and fade_index > 0:
         for color in pxarray_colors(screen_pxarray):
             try:
-                screen_pxarray.replace(color, fade_color_table[fade_index][color_table.index(color)])
+                screen_pxarray.replace(
+                    color,
+                    fade_color_table[fade_index][color_table.index(color)])
             except ValueError:
-                print("ValueError encountered. Color at fault is "+str(color))
+                print("ValueError encountered. Color at fault is " +
+                      str(color))
                 screen_pxarray.replace(color, (0, 0, 0))
     if fade_index == 4:
         for color in pxarray_colors(screen_pxarray):
             screen_pxarray.replace(color, (0, 0, 0))
-    screen.blit(pygame.transform.scale(screen_pxarray.make_surface(), screen_size_scaled), (0, 0))
+    screen.blit(
+        pygame.transform.scale(screen_pxarray.make_surface(),
+                               screen_size_scaled), (0, 0))
     pygame.display.flip()
+
 
 def pause():
     global paused, square1, square2, triangle, noise, sfx1, sfx2, sfx3, sfx4
@@ -2839,6 +3063,8 @@ def pause():
     sfx2.pause()
     sfx3.pause()
     sfx4.pause()
+
+
 def unpause():
     global paused, square1, square2, triangle, noise, sfx1, sfx2, sfx3, sfx4
     paused = False
@@ -2851,11 +3077,12 @@ def unpause():
     sfx3.unpause()
     sfx4.unpause()
 
+
 paused = False
 confirmed = False
 fading = False
 introducing = False
-state = 'select'
+state = "select"
 keys = pygame.key.get_pressed()
 last_keys = keys
 index = 3
@@ -2873,7 +3100,7 @@ time = interval
 frames = 0
 done = False
 clock = pygame.time.Clock()
-screen_text = ScreenText(0, 0, "FPS: "+str(fps)+".00", True)
+screen_text = ScreenText(0, 0, "FPS: " + str(fps) + ".00", True)
 while not done:
     milliseconds = clock.tick(fps)
     if not screen_text == None:
@@ -2892,27 +3119,27 @@ while not done:
             if not game == None:
                 if not square1.get_busy():
                     ##if not game.player == None:
-    ##                    if game.blinking:
-    ##                        square1.play(boss_battle_intro1)
-    ##                        square2.play(boss_battle_intro2)
-    ##                        triangle.play(boss_battle_intro3)
-    ##                        noise.play(boss_battle_intro4)
-    ##                    else:
-    ##                        square1.play(boss_battle1, -1)
-    ##                        square2.play(boss_battle2, -1)
-    ##                        triangle.play(boss_battle3, -1)
-    ##                        noise.play(boss_battle4, -1)
-                        if game.blinking:
-                            square1.play(fireman_intro1)
-                            square2.play(fireman_intro2)
-                            triangle.play(fireman_intro3)
-                            noise.play(fireman_intro4)
-                        else:
-                            if not (not game.player == None and game.player.dead):
-                                square1.play(fireman1, -1)
-                                square2.play(fireman2, -1)
-                                triangle.play(fireman3, -1)
-                                noise.play(fireman4, -1)
+                    ##                    if game.blinking:
+                    ##                        square1.play(boss_battle_intro1)
+                    ##                        square2.play(boss_battle_intro2)
+                    ##                        triangle.play(boss_battle_intro3)
+                    ##                        noise.play(boss_battle_intro4)
+                    ##                    else:
+                    ##                        square1.play(boss_battle1, -1)
+                    ##                        square2.play(boss_battle2, -1)
+                    ##                        triangle.play(boss_battle3, -1)
+                    ##                        noise.play(boss_battle4, -1)
+                    if game.blinking:
+                        square1.play(fireman_intro1)
+                        square2.play(fireman_intro2)
+                        triangle.play(fireman_intro3)
+                        noise.play(fireman_intro4)
+                    else:
+                        if not (not game.player == None and game.player.dead):
+                            square1.play(fireman1, -1)
+                            square2.play(fireman2, -1)
+                            triangle.play(fireman3, -1)
+                            noise.play(fireman4, -1)
         if event.type == sfx1_END:
             if confirmed and game == None:
                 square1.play(boss_intro1)
@@ -2926,7 +3153,7 @@ while not done:
             triangle.set_volume(1)
         if event.type == sfx4_END:
             noise.set_volume(1)
-    time += 1/60
+    time += 1 / 60
     keys = pygame.key.get_pressed()
     if keys[pygame.K_RSHIFT]:
         fps = fps_fast
@@ -2937,12 +3164,12 @@ while not done:
             fade_timer += 1
             if fade_timer >= fade_limit:
                 fade_timer = 0
-                if fade_type == 'out':
+                if fade_type == "out":
                     fade_index += 1
                     if fade_index > 4:
                         fade_index = 0
                         fading = False
-                        if state == 'select':
+                        if state == "select":
                             for portrait in portraits:
                                 portrait.surface_face.remove()
                                 portrait.remove()
@@ -2951,11 +3178,11 @@ while not done:
                             introducing = True
                             selectBG.remove()
                             boss_intro = BossIntro()
-                            state = 'intro'
-                        elif state == 'intro':
+                            state = "intro"
+                        elif state == "intro":
                             boss_intro.remove()
-                            state = 'game'
-                        elif state == 'game':
+                            state = "game"
+                        elif state == "game":
                             if not game.player == None:
                                 if not game.paused:
                                     game.pause()
@@ -2963,17 +3190,17 @@ while not done:
                                     game.unpause()
                             else:
                                 game.reset()
-                elif fade_type == 'in':
+                elif fade_type == "in":
                     fade_index -= 1
                     if fade_index < 0:
                         fade_index = 0
                         fading = False
                 redraw()
-        if state == 'game':
+        if state == "game":
             if not game == None:
                 game.update()
         if not fading:
-            if state == 'game':
+            if state == "game":
                 if game == None:
                     game_timer += 1
                     if game_timer >= game_limit:
@@ -2993,7 +3220,7 @@ while not done:
                         flash_index = 0
                         flashing = False
             if not (not game == None and game.refilling):
-                if confirmed and not flashing and not fading and state == 'select':
+                if confirmed and not flashing and not fading and state == "select":
                     fade()
                 elif not confirmed:
                     if keys[pygame.K_LEFT]:
@@ -3074,15 +3301,19 @@ while not done:
                     sprite.update()
                 if not game == None:
                     if not game.player == None:
-                        game.level_x = -game.player.center['x']+screen_size[0]/2
+                        game.level_x = -game.player.center["x"] + screen_size[
+                            0] / 2
                         if game.level_x > 0:
                             game.level_x = 0
-                        if game.level_x < -game.bounds.right+screen_size[0]:
-                            game.level_x = -game.bounds.right+screen_size[0]
+                        if game.level_x < -game.bounds.right + screen_size[0]:
+                            game.level_x = -game.bounds.right + screen_size[0]
                         game.update_rect()
                         game.player.health_bar.sprite.x = -game.level_x + game.player.health_bar.offset_x
                         game.player.health_bar.update()
-                        game.player.life_text.move(-game.level_x+game.player.health_bar.offset_x, game.player.health_bar.sprite.y+game.player.health_bar.sprite.height)
+                        game.player.life_text.move(
+                            -game.level_x + game.player.health_bar.offset_x,
+                            game.player.health_bar.sprite.y +
+                            game.player.health_bar.sprite.height)
                         screen_text.move(-game.level_x, 0)
                 if not fading:
                     redraw()
@@ -3100,17 +3331,18 @@ while not done:
                         sfx1.play(sfx_health1)
                         if not sfx2.get_sound() == sfx_life:
                             sfx2.play(sfx_health2)
-                    game.refill_recipient.health_bar.update_ticks(game.refill_recipient.health)
-                    game.level_x = -game.player.center['x']+screen_size[0]/2
+                    game.refill_recipient.health_bar.update_ticks(
+                        game.refill_recipient.health)
+                    game.level_x = -game.player.center["x"] + screen_size[0] / 2
                     if game.level_x > 0:
                         game.level_x = 0
-                    if game.level_x < -game.bounds.right+screen_size[0]:
-                        game.level_x = -game.bounds.right+screen_size[0]
+                    if game.level_x < -game.bounds.right + screen_size[0]:
+                        game.level_x = -game.bounds.right + screen_size[0]
                     game.update_rect()
                     screen_text.move(-game.level_x, 0)
                     redraw()
     last_keys = keys
 pygame.display.quit()
-pygame.mixer.quit();
-pygame.quit();
+pygame.mixer.quit()
+pygame.quit()
 sys.exit()
