@@ -2629,7 +2629,7 @@ class Game(object):
                 "through": False,
                 "ladder": False
             },
-            "\\": {
+            "'": {
                 "index": 3,
                 "solid": False,
                 "through": False,
