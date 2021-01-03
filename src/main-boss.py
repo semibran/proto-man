@@ -2398,7 +2398,7 @@ class Boss_Zeus(object):
             'shoot':6
         }
         self.shoot_index = 0
-        self.shots = 0
+        self.shots = 1
         self.jump_timer = 0
         self.jump_limit = 14
         self.jump_shoot_limit = 23
@@ -2770,7 +2770,6 @@ class Game(object):
             "                 ",
             "                 ",
             "                 ",
-            "                 ",
             "..               ",
             "...              ",
             ".....            ",
@@ -2778,6 +2777,7 @@ class Game(object):
             "=================",
             "#######HHHH######",
             "HHH############HH",
+            "#######HHHH######",
         ])
         self.map = [
             "0"
@@ -2911,9 +2911,9 @@ class Game(object):
                         self.blinks = 0
                         self.blinking = False
                         self.ready.remove()
-                        self.player = Player((2+self.room_id[0]*screen_size[0]/tile_size, 11+self.room_id[1]*screen_size[1]/tile_size))
+                        self.player = Player((2+self.room_id[0]*screen_size[0]/tile_size, 10+self.room_id[1]*screen_size[1]/tile_size))
                         self.playing = True
-                        self.enemies.append(Boss_Zeus((13, 11)))
+                        self.enemies.append(Boss_Zeus((13, 10)))
         else:
             if not self.player == None:
                 if not self.player.warping:
