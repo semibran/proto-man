@@ -1148,7 +1148,7 @@ class Player(object):
         self.shot_height = 8
         self.shot_damage = 1
         self.shot_mid_damage = 2
-        self.shot_large_damage = 4
+        self.shot_large_damage = 3
         self.shot_piercing = False
         self.warping = True
         self.warp_timer = 0
@@ -2290,7 +2290,7 @@ class Shot_Zeus(object):
         self.stopped = False
         self.stop_timer = 0
         self.stop_limit = 60
-        self.damage = 4
+        self.damage = 5
         sfx4.play(sfx_lightning_ball)
     def update_rect(self):
         self.rect = Rectangle(
@@ -2342,7 +2342,7 @@ class Shot_Zeus(object):
                         self.velocity_y = math.sin(self.radians)*self.speed
 
                 self.sprite.subX = self.index*self.sprite.subWidth
-                if self.rect.intersect(game.player.rect):
+                if game.player is not None and self.rect.intersect(game.player.rect):
                     game.player.hit(self.damage, self.direction)
                 if not self.rect.intersect(screen_rect):
                     self.sprite.remove()
@@ -2390,7 +2390,7 @@ class Boss_Zeus(object):
         self.grounded = True
         self.invincible = False
         self.shielded = False
-        self.damage = 6
+        self.damage = 8
         self.state = 'idle'
         self.state_timer = 0
         self.timers = {
