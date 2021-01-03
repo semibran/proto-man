@@ -1146,9 +1146,9 @@ class Player(object):
         self.shot_type = 'normal'
         self.shot_width = 8
         self.shot_height = 8
-        self.shot_damage = 2
-        self.shot_mid_damage = 3
-        self.shot_large_damage = 6
+        self.shot_damage = 1
+        self.shot_mid_damage = 2
+        self.shot_large_damage = 4
         self.shot_piercing = False
         self.warping = True
         self.warp_timer = 0
@@ -1358,8 +1358,8 @@ class Player(object):
                 game.scroll_direction_y = -1
         if self.rect.left < 0:
             self.sprite.x = -self.rect_offset_x1
-        if self.rect.right > len(game.map[0])*screen_size[0]*tile_size:
-            self.sprite.x = len(game.map[0])*screen_size[1]*tile_size-self.rect_offset_x2
+        if self.rect.right > len(game.map[0])*screen_size[0]:
+            self.sprite.x = len(game.map[0])*screen_size[0]-self.rect_offset_x2
         if self.rect.top > game.rect.bottom:
             self.kill()
         self.update_rect()
@@ -2780,7 +2780,7 @@ class Game(object):
             "HHH############HH",
         ])
         self.map = [
-            "0",
+            "0"
         ]
         self.room_id = (0, 0)
         self.player = None
