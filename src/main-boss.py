@@ -2294,10 +2294,10 @@ class Shot_Zeus(object):
         sfx4.play(sfx_lightning_ball)
     def update_rect(self):
         self.rect = Rectangle(
-            self.sprite.x,
-            self.sprite.y,
-            self.sprite.x+self.sprite.width,
-            self.sprite.y+self.sprite.height,
+            self.sprite.x + 4,
+            self.sprite.y + 4,
+            self.sprite.x + 4 + self.sprite.width - 8,
+            self.sprite.y + 4 + self.sprite.height - 8,
         )
         self.center['x'] = self.sprite.x+self.sprite.width/2
         self.center['y'] = self.sprite.y+self.sprite.height/2
@@ -2395,7 +2395,7 @@ class Boss_Zeus(object):
         self.state_timer = 0
         self.timers = {
             'land': 5,
-            'shoot': 8,
+            'shoot': 6,
             'reload': 20
         }
         self.reload_timer = 0
