@@ -2394,17 +2394,17 @@ class Boss_Zeus(object):
         self.state = 'idle'
         self.state_timer = 0
         self.timers = {
-            'land':5,
-            'shoot':6
+            'land': 5,
+            'shoot': 8,
+            'reload': 20
         }
+        self.reload_timer = 0
         self.shoot_index = 0
-        self.shots = 1
+        self.shots = 0
         self.jump_timer = 0
         self.jump_limit = 14
         self.jump_shoot_limit = 23
         self.reloading = False
-        self.reload_timer = 0
-        self.reload_limit = 10
         self.rounds = 0
         self.jumping_forward = False
         self.bolt_timer = 0
@@ -2501,7 +2501,6 @@ class Boss_Zeus(object):
         self.stop_run()
         self.turn()
         self.change_state('shoot')
-        self.shots += 1
     def run(self):
         self.shots = 0
         self.running = True
@@ -2578,32 +2577,26 @@ class Boss_Zeus(object):
                     self.state_timer += 1
                     if self.reloading:
                         self.reload_timer += 1
-                        self.shoot_index = 0
-                        self.state_timer = 0
-                        if self.reload_timer >= self.reload_limit:
+                        if self.reload_timer >= self.timers['reload']:
+                            self.state_timer = 0
                             self.reload_timer = 0
                             self.reloading = False
-                            self.shots = 0
-                    if not self.reloading or self.shoot_index > 0:
-                        if self.state_timer >= self.timers['shoot']:
-                            self.state_timer = 0
-                            self.shoot_index += 1
-                            if self.shoot_index > 2:
-                                self.shoot_index = 0
-                            if self.shoot_index == 1:
-                                if self.shots < 3:
-                                    self.shoot()
-                                else:
-                                    if self.rounds < 1:
-                                        self.rounds += 1
-                                        self.reloading = True
-                                        self.shots = 0
-                                        self.shot_index = 0
-                                    else:
-                                        self.rounds = 0
-                                        self.state = 'dumb_fall'
-                                        self.shots = 0
-                                        self.shot_index = 0
+                            if self.rounds == 2:
+                              self.rounds = 0
+                              self.state = 'dumb_fall'
+                    if (self.state_timer >= self.timers['shoot']
+                    and (not self.reloading or self.shoot_index > 0)):
+                        self.state_timer = 0
+                        self.shoot_index += 1
+                        if self.shoot_index == 1 and not self.reloading:
+                            self.shoot()
+                            self.shots += 1
+                            if self.shots == 3:
+                                self.shots = 0
+                                self.rounds += 1
+                                self.reloading = True
+                        elif self.shoot_index == 3:
+                            self.shoot_index = 0
                 if self.state == 'land':
                     self.velocity_x = 0
                     index = self.index_land
@@ -2641,8 +2634,8 @@ class Boss_Zeus(object):
                     self.jump_timer += 1
                     if self.jump_timer >= self.jump_shoot_limit:
                         self.jump_timer = 0
-                        self.shoot()
                         self.turn()
+                        self.change_state("shoot")
                     self.jumping_forward = False
                 if self.state == 'jump_back':
                     index = self.index_jump_back
